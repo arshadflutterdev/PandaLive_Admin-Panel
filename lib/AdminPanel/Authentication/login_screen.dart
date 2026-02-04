@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
+import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -39,22 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: MyTextField(label: Text("Enter Your Password")),
           ),
           Gap(15),
-          SizedBox(
-            height: 40,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2D5A27),
-                shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(
-                "Login to Admin Panel",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
+          SizedBox(height: 40, child: MyElevatedButton()),
         ],
       ),
     );
