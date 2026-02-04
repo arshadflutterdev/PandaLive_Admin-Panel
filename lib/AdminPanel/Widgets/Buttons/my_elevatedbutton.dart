@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
 class MyElevatedButton extends StatelessWidget {
-  const MyElevatedButton({super.key});
+  final Widget child;
+  final VoidCallback onpressed;
+  final Color? bcolor;
+  const MyElevatedButton({
+    super.key,
+    required this.child,
+    required this.onpressed,
+    this.bcolor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF2D5A27),
+        backgroundColor: bcolor ?? const Color(0xFF2D5A27),
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
       onPressed: () {},
-      child: Text(
-        "Login to Admin Panel",
-        style: TextStyle(color: Colors.white),
-      ),
+      child: child,
     );
   }
 }

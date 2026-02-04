@@ -24,23 +24,40 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
 
         children: [
-          Text("Welcome Back", style: TextStyle(fontSize: 30)),
-          Gap(15),
-          Text("Login to access administration"),
+          Text(
+            "Welcome Back",
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+          ),
+          Gap(8),
+          Text(
+            "Sign in to manage the admin dashboard",
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+
           Gap(10),
           Center(
             child: SizedBox(
-              width: kIsWeb ? width * 0.30 : 50,
-              child: MyTextField(label: Text("Add Your Email")),
+              width: kIsWeb ? width * 0.30 : width * 0.90,
+              child: MyTextField(label: Text("Email Address")),
             ),
           ),
           Gap(15),
           SizedBox(
             width: kIsWeb ? width * 0.30 : 50,
-            child: MyTextField(label: Text("Enter Your Password")),
+            child: MyTextField(label: Text("Password")),
           ),
           Gap(15),
-          SizedBox(height: 40, child: MyElevatedButton()),
+          SizedBox(
+            height: 40,
+            child: MyElevatedButton(
+              bcolor: Color(0xFF1E3A8A),
+              onpressed: () {},
+              child: Text(
+                "Login as Admin",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
         ],
       ),
     );
