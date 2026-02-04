@@ -23,6 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
 
         children: [
+          Text("Welcome Back", style: TextStyle(fontSize: 30)),
+          Gap(15),
+          Text("Login to access administration"),
+          Gap(10),
           Center(
             child: SizedBox(
               width: kIsWeb ? width * 0.30 : 50,
@@ -32,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Gap(15),
           SizedBox(
             width: kIsWeb ? width * 0.30 : 50,
-            child: MyTextField(label: Text("Enter Your Email")),
+            child: MyTextField(label: Text("Enter Your Password")),
           ),
           Gap(15),
           SizedBox(
