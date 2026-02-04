@@ -32,7 +32,24 @@ class _LoginScreenState extends State<LoginScreen> {
           Gap(15),
           SizedBox(
             width: kIsWeb ? width * 0.30 : 50,
-            child: MyTextField(label: Text("Add Your Email")),
+            child: MyTextField(label: Text("Enter Your Email")),
+          ),
+          Gap(15),
+          SizedBox(
+            height: 40,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2D5A27),
+                shape: ContinuousRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {},
+              child: Text(
+                "Login to Admin Panel",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
