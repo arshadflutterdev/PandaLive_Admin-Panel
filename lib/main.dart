@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:panda_adminpanel/AdminPanel/Authentication/login_screen.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/firebase_options.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      getPages: AppRoutes.routes,
+      initialRoute: AppRoutes.login,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const LoginScreen(),
     );
   }
 }
