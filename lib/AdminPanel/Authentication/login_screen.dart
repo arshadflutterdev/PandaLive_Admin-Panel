@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
@@ -51,7 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 40,
             child: MyElevatedButton(
               bcolor: Color(0xFF1E3A8A),
-              onpressed: () {},
+              onpressed: () {
+                Get.toNamed(AppRoutes.home);
+              },
               child: Text(
                 "Login as Admin",
                 style: TextStyle(color: Colors.white),
