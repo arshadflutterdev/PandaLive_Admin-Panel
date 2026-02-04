@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class MyTextField extends StatelessWidget {
-  final String? label;
+  final Widget? label;
   final Widget? prefix;
   final Widget? suffix;
-  final String? hintText;
+  final Widget? hintText;
   const MyTextField({
     super.key,
     this.hintText,
@@ -18,7 +18,10 @@ class MyTextField extends StatelessWidget {
     return TextFormField(
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        label: Text("Enter Your Email"),
+        suffixIcon: suffix,
+        prefix: prefix,
+        label: label,
+        hint: hintText,
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(10),

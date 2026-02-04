@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
 
@@ -22,7 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
 
         children: [
-          SizedBox(width: kIsWeb ? width * 0.30 : 50, child: MyTextField()),
+          Center(
+            child: SizedBox(
+              width: kIsWeb ? width * 0.30 : 50,
+              child: MyTextField(label: Text("Add Your Email")),
+            ),
+          ),
+          Gap(15),
+          SizedBox(
+            width: kIsWeb ? width * 0.30 : 50,
+            child: MyTextField(label: Text("Add Your Email")),
+          ),
         ],
       ),
     );
