@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: MyElevatedButton(
               bcolor: Color(0xFF1E3A8A),
               onpressed: () {
-                Get.toNamed(AppRoutes.home);
+                Get.toNamed(AppRoutes.sidebar);
               },
               child: Text(
                 "Login as Admin",
