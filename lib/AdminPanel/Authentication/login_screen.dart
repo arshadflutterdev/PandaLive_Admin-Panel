@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get/route_manager.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
