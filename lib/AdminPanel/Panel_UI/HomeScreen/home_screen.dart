@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
@@ -17,6 +18,14 @@ class _HomeScreenState extends State<HomeScreen> {
     "Wallet",
     "Settings",
     "About Me",
+  ];
+  List<Icon> tabIcons = [
+    Icon(Icons.home),
+    Icon(Icons.group),
+    Icon(Icons.auto_graph),
+    Icon(Icons.wallet),
+    Icon(Icons.settings),
+    Icon(CupertinoIcons.profile_circled),
   ];
   @override
   Widget build(BuildContext context) {
@@ -78,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
 
-                                Icon(Icons.home),
+                                tabIcons[index],
                               ],
                             ),
                           ),
