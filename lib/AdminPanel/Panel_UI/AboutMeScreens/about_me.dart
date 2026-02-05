@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class AboutMe extends StatefulWidget {
   const AboutMe({super.key});
@@ -10,6 +11,9 @@ class AboutMe extends StatefulWidget {
 class _AboutMeState extends State<AboutMe> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: AppColours.bg,
+      body: Center(child: Text("About me")),
+    );
   }
 }

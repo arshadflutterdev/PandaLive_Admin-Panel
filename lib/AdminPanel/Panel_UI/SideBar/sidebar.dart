@@ -8,6 +8,7 @@ import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.da
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class SideBarScreen extends StatefulWidget {
@@ -34,13 +35,13 @@ class _SideBarScreenState extends State<SideBarScreen> {
     Icon(Icons.settings),
     Icon(CupertinoIcons.profile_circled),
   ];
-  List<Widget> adminScreens = [
-    HomeScreen(),
-    GraphScreen(),
-    SettingsScreen(),
-    AppUsersScreen(),
-    WalletScreen(),
-    AboutMe(),
+  List<String> adminScreens = [
+    AppRoutes.home,
+    AppRoutes.graph,
+    AppRoutes.setting,
+    AppRoutes.users,
+    AppRoutes.wallet,
+    AppRoutes.me,
   ];
   RxInt selectedIndex = 0.obs;
   @override
@@ -85,30 +86,43 @@ class _SideBarScreenState extends State<SideBarScreen> {
                           onTap: () {
                             selectedIndex.value = index;
                           },
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Wrap(
-                                spacing: 10,
-                                alignment: WrapAlignment.center,
-                                runSpacing: 10,
-                                children: [
-                                  Text(
-                                    tabNames[index].toString(),
+                          child: Obx(
+                            () => Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: selectedIndex.value == index
+                                    ? Colors.black
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Wrap(
+                                  spacing: 10,
+                                  alignment: WrapAlignment.center,
+                                  runSpacing: 10,
+                                  children: [
+                                    Text(
+                                      tabNames[index].toString(),
 
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: selectedIndex.value == index
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
                                     ),
-                                  ),
-
-                                  tabIcons[index],
-                                ],
+                                    Icon(
+                                      tabIcons[index].icon,
+                                      color: selectedIndex.value == index
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

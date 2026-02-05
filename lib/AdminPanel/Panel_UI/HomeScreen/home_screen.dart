@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Center(child: Text("My data will be shown"))],
+        children: [Center(child: Text("Home Page"))],
       ),
     );
   }
