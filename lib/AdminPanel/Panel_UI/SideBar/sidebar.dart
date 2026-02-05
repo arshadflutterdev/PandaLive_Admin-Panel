@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/state_manager.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
@@ -42,7 +41,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
     WalletScreen(),
     AboutMe(),
   ];
-  RxInt selectedIndex = 0.obs;
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -76,43 +75,39 @@ class _SideBarScreenState extends State<SideBarScreen> {
                   child: ListView.builder(
                     itemCount: tabNames.length,
                     itemBuilder: (context, index) {
-                      return Obx(
-                        () => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              selectedIndex.value = index;
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: Wrap(
-                                  spacing: 10,
-                                  alignment: WrapAlignment.center,
-                                  runSpacing: 10,
-                                  children: [
-                                    Text(
-                                      tabNames[index].toString(),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            selectedIndex = index;
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Wrap(
+                                spacing: 10,
+                                alignment: WrapAlignment.center,
+                                runSpacing: 10,
+                                children: [
+                                  Text(
+                                    tabNames[index].toString(),
 
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                  ),
 
-                                    tabIcons[index],
-                                  ],
-                                ),
+                                  tabIcons[index],
+                                ],
                               ),
                             ),
                           ),
@@ -127,7 +122,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
           Expanded(
             child: Container(
               color: Colors.white,
-              child: adminScreens[selectedIndex.value],
+              child: adminScreens[selectedIndex],
             ),
           ),
         ],
