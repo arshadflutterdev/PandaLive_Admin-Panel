@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/state_manager.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
@@ -41,7 +42,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
     WalletScreen(),
     AboutMe(),
   ];
-  int selectedIndex = 0;
+  RxInt selectedIndex = 0.obs;
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -82,7 +83,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
                         ),
                         child: GestureDetector(
                           onTap: () {
-                            selectedIndex = index;
+                            selectedIndex.value = index;
                           },
                           child: Container(
                             width: double.infinity,
@@ -122,7 +123,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
           Expanded(
             child: Container(
               color: Colors.white,
-              child: adminScreens[selectedIndex],
+              child: Obx(() => adminScreens[selectedIndex.value]),
             ),
           ),
         ],
