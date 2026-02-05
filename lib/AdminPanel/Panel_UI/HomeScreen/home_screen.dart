@@ -82,6 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             vertical: 3,
                           ),
                           child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => adminScreens[index],
+                                ),
+                              );
+                            },
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
