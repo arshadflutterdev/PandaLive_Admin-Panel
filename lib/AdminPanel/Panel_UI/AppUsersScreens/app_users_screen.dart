@@ -141,6 +141,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                   ),
                                 ),
                               ),
+
                               title: Text(
                                 userdata["name"] ?? "no name",
                                 style: TextStyle(color: Colors.white),
