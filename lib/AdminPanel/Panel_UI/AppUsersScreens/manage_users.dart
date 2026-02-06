@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,46 @@ class ManageUsers extends StatefulWidget {
 }
 
 class _ManageUsersState extends State<ManageUsers> {
+  //function to delete user
+  Future<void> deleteAuser(String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("userProfile")
+          .doc(userId)
+          .delete();
+      Get.back();
+      Get.back();
+      Get.snackbar(
+        "Success",
+        "User Deleted Successfully",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      e.toString();
+    }
+  }
+
+  void deleteUser() {
+    Get.defaultDialog(
+      title: "Sure to Delete the User",
+      content: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text("You Are About To Delete an Panda Live App User"),
+      ),
+      titleStyle: TextStyle(fontSize: 20),
+      backgroundColor: Colors.white,
+      cancel: TextButton(
+        onPressed: () {
+          Get.back();
+        },
+        child: Text("Cancel"),
+      ),
+      confirm: TextButton(onPressed: () {}, child: Text("Confirm")),
+    );
+  }
+
   final Map<String, dynamic> user = Get.arguments;
   @override
   Widget build(BuildContext context) {
@@ -115,7 +156,6 @@ class _ManageUsersState extends State<ManageUsers> {
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: width * 0.30,
@@ -134,13 +174,19 @@ class _ManageUsersState extends State<ManageUsers> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Total Withdrawl Ammount"),
+                      Expanded(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+
+                          "Total Withdrawl Ammount",
+                        ),
+                      ),
                       Spacer(),
                       Text("350\$"),
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: width * 0.30,
@@ -155,7 +201,6 @@ class _ManageUsersState extends State<ManageUsers> {
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: width * 0.30,
@@ -166,11 +211,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     children: [
                       Text("Followers"),
                       Spacer(),
-                      Text(user["totalFollowers"].toString()),
+                      Text(user["totalFollowers"] ?? "No follower".toString()),
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: width * 0.30,
@@ -181,7 +225,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     children: [
                       Text("Follow"),
                       Spacer(),
-                      Text(user["totalFollowing"].toString()),
+                      Text(user["totalFollowing"] ?? "No follow".toString()),
                     ],
                   ),
                 ),
@@ -202,14 +246,54 @@ class _ManageUsersState extends State<ManageUsers> {
               ],
             ),
           ),
+          Gap(15),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
-              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
-
-              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
+              SizedBox(
+                height: 40,
+                child: MyElevatedButton(
+                  bcolor: Colors.white,
+                  child: Row(
+                    children: [
+                      Text(
+                        "Delete User",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Icon(Icons.delete, color: Colors.red),
+                    ],
+                  ),
+                  onpressed: () {
+                    deleteUser();
+                  },
+                ),
+              ),
+              Gap(20),
+              SizedBox(
+                height: 40,
+                child: MyElevatedButton(
+                  bcolor: Color(0xffCF0F0F),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Block User",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Gap(5),
+                      Icon(Icons.block, color: Colors.white),
+                    ],
+                  ),
+                  onpressed: () {},
+                ),
+              ),
             ],
           ),
         ],
