@@ -40,7 +40,6 @@ class _SideBarScreenState extends State<SideBarScreen> {
     GraphScreen(),
     WalletScreen(),
     SettingsScreen(),
-
     AboutMe(),
   ];
   RxInt selectedIndex = 0.obs;

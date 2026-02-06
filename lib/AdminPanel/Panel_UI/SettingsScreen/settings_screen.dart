@@ -11,6 +11,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text("Settings"), backgroundColor: AppColours.bg);
+    return Scaffold(
+      body: Center(child: Text("Settings")),
+      backgroundColor: AppColours.bg,
+    );
   }
 }
