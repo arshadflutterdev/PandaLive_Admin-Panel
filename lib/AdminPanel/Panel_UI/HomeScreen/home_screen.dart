@@ -1,12 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/state_manager.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,33 +17,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColours.bg,
-      appBar: AppBar(
-        title: Expanded(
-          child: Text(
+
+      body: Column(
+        children: [
+          Gap(10),
+          Text(
             "Panda Sight: 12 Streams Active",
             overflow: TextOverflow.ellipsis,
             maxLines: 3,
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 22,
+
               letterSpacing: 2,
               fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColours.bg,
-      ),
-      body: GridView.builder(
-        itemCount: 10,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-        ),
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Container(decoration: BoxDecoration(color: Colors.red)),
-          );
-        },
+
+          Gap(15),
+          Expanded(
+            child: GridView.builder(
+              physics: AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              itemCount: 20,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+              ),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
