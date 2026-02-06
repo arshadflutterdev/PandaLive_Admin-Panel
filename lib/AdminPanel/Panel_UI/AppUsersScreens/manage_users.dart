@@ -211,7 +211,11 @@ class _ManageUsersState extends State<ManageUsers> {
                     children: [
                       Text("Followers"),
                       Spacer(),
-                      Text(user["totalFollowers"] ?? "No follower".toString()),
+                      Text(
+                        (user["totalFollowers"] != null)
+                            ? user["totalFollowers"]
+                            : "0",
+                      ),
                     ],
                   ),
                 ),
@@ -225,7 +229,11 @@ class _ManageUsersState extends State<ManageUsers> {
                     children: [
                       Text("Follow"),
                       Spacer(),
-                      Text(user["totalFollowing"] ?? "No follow".toString()),
+                      Text(
+                        (user["totalFollowing"] != null)
+                            ? user["totalFollowing"]
+                            : "0",
+                      ),
                     ],
                   ),
                 ),
