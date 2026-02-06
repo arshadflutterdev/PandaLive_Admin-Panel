@@ -84,9 +84,30 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                           child: Text("Small Error Found We are Working on"),
                         );
                       }
-                      final data = snapshot.data;
+                      final data = snapshot.data!.docs;
 
-                      return Text(data.toString());
+                      return ListView.builder(
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          var userdata =
+                              data[index].data() as Map<String, dynamic>;
+                          return ListTile(
+                            leading: Icon(Icons.person),
+                            title: Text(userdata["name"]),
+                            subtitle: Row(
+                              children: [
+                                Text(
+                                  "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
+                                ),
+                                Gap(10),
+                                Text(
+                                  "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
                     }
                   },
                 ),
