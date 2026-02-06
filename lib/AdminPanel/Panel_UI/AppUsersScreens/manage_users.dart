@@ -19,6 +19,8 @@ class _ManageUsersState extends State<ManageUsers> {
     return Scaffold(
       backgroundColor: AppColours.bg,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Gap(20),
           Row(
@@ -28,7 +30,9 @@ class _ManageUsersState extends State<ManageUsers> {
               Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.back();
+                  },
                   icon: Icon(Icons.arrow_back_ios_new_outlined, size: 30),
                 ),
               ),
@@ -73,6 +77,129 @@ class _ManageUsersState extends State<ManageUsers> {
                 ],
               ),
             ],
+          ),
+          Gap(30),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Country"),
+                      Spacer(),
+                      Text(user["country"].toString()),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Week Earned Coins"),
+                      Spacer(),
+
+                      Text(user["coins"].toString()),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [Text("Week Earnings"), Spacer(), Text("45\$")],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Total Withdrawl Ammount"),
+                      Spacer(),
+                      Text("350\$"),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Gender"),
+                      Spacer(),
+                      Text(user["gender"].toString()),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Followers"),
+                      Spacer(),
+                      Text(user["totalFollowers"].toString()),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Follow"),
+                      Spacer(),
+                      Text(user["totalFollowing"].toString()),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Date Of Birth"),
+                      Spacer(),
+                      Text(user["dob"].toString()),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
