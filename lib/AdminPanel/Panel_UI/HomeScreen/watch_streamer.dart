@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:panda_adminpanel/AdminPanel/Controllers/watchlive_controller.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
 
 class WatchstreamingClass extends StatefulWidget {
@@ -137,6 +138,7 @@ class _WatchstreamingClassState extends State<WatchstreamingClass> {
     }
   }
 
+  final streamcontroll = Get.find<WatchStreamControllers>();
   //now get commentFollowingScreen
   var getComment = FirebaseFirestore.instance.collection("LiveStream");
   late Stream<QuerySnapshot> _commentStream;

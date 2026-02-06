@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
+import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
 
 class AppUsersScreen extends StatefulWidget {
   const AppUsersScreen({super.key});
@@ -38,7 +39,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
       backgroundColor: AppColours.bg,
       body: Column(
         children: [
-          Gap(15),
+          Gap(5),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -99,12 +100,43 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                             child: ListTile(
                               leading: CircleAvatar(
                                 radius: 30,
-
                                 backgroundColor: Colors.white,
-                                backgroundImage: userdata["userimage"] != null
-                                    ? NetworkImage(userdata["userimage"])
-                                    : AssetImage(AppImages.user)
-                                          as ImageProvider,
+                                child: ClipOval(
+                                  child: Image.network(
+                                    (userdata["userimage"] != null &&
+                                            userdata["userimage"]
+                                                .toString()
+                                                .startsWith("http"))
+                                        ? userdata["userimage"]
+                                              .toString()
+                                              .replaceFirst(
+                                                "http://",
+                                                "https://",
+                                              )
+                                        : "", // Empty string agar image na ho
+                                    fit: BoxFit.cover,
+                                    width: 60,
+                                    height: 60,
+
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        AppImages.user,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                    // Loading ke waqt placeholder
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          );
+                                        },
+                                  ),
+                                ),
                               ),
                               title: Text(
                                 userdata["name"] ?? "no name",
@@ -122,6 +154,20 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
+                              ),
+                              trailing: SizedBox(
+                                height: 45,
+                                child: MyElevatedButton(
+                                  bcolor: Colors.white,
+                                  child: Text(
+                                    "Manage",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onpressed: () {},
+                                ),
                               ),
                             ),
                           );
