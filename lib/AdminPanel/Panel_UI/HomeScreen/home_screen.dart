@@ -24,10 +24,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColours.bg,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Center(child: Text("Home Page"))],
+      appBar: AppBar(
+        title: Expanded(
+          child: Text(
+            "Panda Sight: 12 Streams Active",
+            overflow: TextOverflow.ellipsis,
+            maxLines: 3,
+            style: TextStyle(
+              fontSize: 30,
+              letterSpacing: 2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: AppColours.bg,
+      ),
+      body: GridView.builder(
+        itemCount: 10,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+        ),
+        itemBuilder: (context, index) {
+          return Container(color: Colors.red);
+        },
       ),
     );
   }
