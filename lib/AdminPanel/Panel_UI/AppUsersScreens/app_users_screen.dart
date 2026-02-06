@@ -118,9 +118,9 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                               )
                                         : "", // Empty string agar image na ho
                                     fit: BoxFit.cover,
-                                    width: 60,
-                                    height: 60,
 
+                                    // width: 30,
+                                    // height: 30,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Image.asset(
                                         AppImages.user,

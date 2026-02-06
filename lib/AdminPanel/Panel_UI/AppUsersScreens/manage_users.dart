@@ -38,19 +38,36 @@ class _ManageUsersState extends State<ManageUsers> {
   void deleteUser() {
     Get.defaultDialog(
       title: "Sure to Delete the User",
-      content: Padding(
-        padding: const EdgeInsets.all(8.0),
+      content: const Padding(
+        padding: EdgeInsets.all(8.0),
         child: Text("You Are About To Delete an Panda Live App User"),
       ),
-      titleStyle: TextStyle(fontSize: 20),
+      titleStyle: const TextStyle(fontSize: 20),
       backgroundColor: Colors.white,
       cancel: TextButton(
-        onPressed: () {
-          Get.back();
-        },
-        child: Text("Cancel"),
+        onPressed: () => Get.back(),
+        child: const Text("Cancel"),
       ),
-      confirm: TextButton(onPressed: () {}, child: Text("Confirm")),
+      confirm: TextButton(
+        onPressed: () {
+          // Yahan 'uid' check karein
+          final String? userId = user["userId"];
+
+          if (userId != null && userId.isNotEmpty) {
+            deleteAuser(userId); // Agar ID hai to delete function call hoga
+          } else {
+            // Agar ID nahi hai to hi ye snackbar chalna chahiye
+            Get.snackbar(
+              "Error",
+              "User ID not found in data",
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+          }
+        },
+
+        child: const Text("Confirm", style: TextStyle(color: Colors.red)),
+      ),
     );
   }
 
@@ -213,7 +230,7 @@ class _ManageUsersState extends State<ManageUsers> {
                       Spacer(),
                       Text(
                         (user["totalFollowers"] != null)
-                            ? user["totalFollowers"]
+                            ? user["totalFollowers"].toString()
                             : "0",
                       ),
                     ],
@@ -231,7 +248,7 @@ class _ManageUsersState extends State<ManageUsers> {
                       Spacer(),
                       Text(
                         (user["totalFollowing"] != null)
-                            ? user["totalFollowing"]
+                            ? user["totalFollowing"].toString()
                             : "0",
                       ),
                     ],
