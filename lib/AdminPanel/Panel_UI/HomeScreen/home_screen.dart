@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -45,19 +46,23 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (snapshot.hasError) {
             return Text("Error in data");
           } else if (!snapshot.hasData) {
-            return Text("There is no data");
+            return Center(child: Text("There is no data"));
           } else {
             final docs = snapshot.data?.docs ?? [];
+            if (docs.isEmpty) {
+              return Center(child: Text("No one Live NOw"));
+            }
             return GridView.builder(
               itemCount: docs.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisSpacing: 4,
                 mainAxisSpacing: 4,
-                crossAxisCount: 2,
+                crossAxisCount: kIsWeb ? 3 : 2,
                 childAspectRatio: 1.1,
               ),
               itemBuilder: (context, index) {
                 final data = docs[index].data() as Map<String, dynamic>;
+                if (data.isEmpty) {}
                 return GestureDetector(
                   onTap: () {
                     if (data["agoraUid"] == null) {
@@ -91,7 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         fit: BoxFit.cover,
                         image: data["image"] != null
                             ? NetworkImage(data["image"])
-                            : Icon(Icons.image) as ImageProvider,
+                            : Icon(Icons.image, color: Colors.black)
+                                  as ImageProvider,
                       ),
                     ),
                     child: Column(
@@ -123,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
@@ -131,14 +137,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               Gap(5),
 
                               Spacer(),
-                              Icon(Icons.remove_red_eye, color: Colors.white),
+                              Icon(Icons.remove_red_eye, color: Colors.red),
                               Gap(3),
                               Text(
                                 (data["views"] ?? 0).toString(),
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  color: Colors.green,
                                 ),
                               ),
                             ],
