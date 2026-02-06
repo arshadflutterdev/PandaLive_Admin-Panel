@@ -75,7 +75,9 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                   stream: userStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return Center(
+                        child: CircularProgressIndicator(color: Colors.green),
+                      );
                     } else if (!snapshot.hasData) {
                       return Center(child: Text("No User Found"));
                     } else {
@@ -91,19 +93,34 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                         itemBuilder: (context, index) {
                           var userdata =
                               data[index].data() as Map<String, dynamic>;
-                          return ListTile(
-                            leading: Icon(Icons.person),
-                            title: Text(userdata["name"]),
-                            subtitle: Row(
-                              children: [
-                                Text(
-                                  "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
-                                ),
-                                Gap(10),
-                                Text(
-                                  "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
-                                ),
-                              ],
+                          return Card(
+                            color: Color(0xff0D1A63),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                radius: 30,
+
+                                backgroundColor: Colors.white,
+                                backgroundImage: userdata["userimage"] != null
+                                    ? NetworkImage(userdata["userimage"])
+                                    : AssetImage("") as ImageProvider,
+                              ),
+                              title: Text(
+                                userdata["name"] ?? "no name",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Text(
+                                    "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Gap(10),
+                                  Text(
+                                    "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
