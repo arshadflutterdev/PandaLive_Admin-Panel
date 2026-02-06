@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class AppUsersScreen extends StatefulWidget {
@@ -23,9 +24,44 @@ class _AppUsersScreenState extends State<AppUsersScreen>
       backgroundColor: AppColours.bg,
       body: Column(
         children: [
-          TabBar(
-            controller: tabController,
-            tabs: [Text("pehli tab"), Text("2sri tab")],
+          Gap(15),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 50,
+              child: TabBar(
+                // dividerColor: Colors.black,
+                indicatorColor: Colors.red,
+                labelColor: Colors.white,
+                controller: tabController,
+                indicator: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                indicatorPadding: EdgeInsets.zero,
+                indicatorSize: TabBarIndicatorSize.tab,
+                unselectedLabelStyle: TextStyle(color: Colors.black),
+
+                tabs: [
+                  Text("Total App Users", style: TextStyle(fontSize: 18)),
+                  Text("Blocked Users", style: TextStyle(fontSize: 18)),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                Center(child: Text("pehly tab ka data")),
+                Center(child: Text("pehly tab ka data")),
+              ],
+            ),
           ),
         ],
       ),
