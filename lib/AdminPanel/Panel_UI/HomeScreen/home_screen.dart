@@ -46,7 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisCount: 3,
         ),
         itemBuilder: (context, index) {
-          return Container(color: Colors.red);
+          return Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Container(decoration: BoxDecoration(color: Colors.red)),
+          );
         },
       ),
     );
