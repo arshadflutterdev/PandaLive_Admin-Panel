@@ -18,21 +18,13 @@ class SideBarScreen extends StatefulWidget {
 }
 
 class _SideBarScreenState extends State<SideBarScreen> {
-  List<String> tabNames = [
-    "Home",
-    "AppUsers",
-    "Graph",
-    "Wallet",
-    "Settings",
-    "About Me",
-  ];
+  List<String> tabNames = ["Home", "AppUsers", "Graph", "Wallet", "Settings"];
   List<Icon> tabIcons = [
     Icon(Icons.home),
     Icon(Icons.group),
     Icon(Icons.auto_graph),
     Icon(Icons.wallet),
     Icon(Icons.settings),
-    Icon(CupertinoIcons.profile_circled),
   ];
   List<Widget> adminScreens = [
     HomeScreen(),
@@ -40,7 +32,6 @@ class _SideBarScreenState extends State<SideBarScreen> {
     GraphScreen(),
     WalletScreen(),
     SettingsScreen(),
-    AboutMe(),
   ];
   RxInt selectedIndex = 0.obs;
   @override
