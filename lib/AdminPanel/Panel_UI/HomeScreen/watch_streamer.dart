@@ -249,40 +249,7 @@ class _WatchstreamingClassState extends State<WatchstreamingClass> {
                       ),
                     ),
                   ),
-                  Spacer(),
-                  SizedBox(
-                    height: 38,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: ContinuousRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        streamcontroll.toggleFollow();
-                      },
-                      child: Obx(
-                        () => streamcontroll.isfollowing.value
-                            ? Text(
-                                "Following",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                "Follow",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
+
                   Gap(5),
                   IconButton(
                     style: IconButton.styleFrom(
@@ -440,102 +407,11 @@ class _WatchstreamingClassState extends State<WatchstreamingClass> {
 
 class WatchStreamControllers extends GetxController {
   RxBool isfollowing = false.obs;
-  final currenduser = FirebaseAuth.instance.currentUser!.uid;
+  final String currenduser =
+      FirebaseAuth.instance.currentUser?.uid ?? "guest_admin";
   TextEditingController commentController = TextEditingController();
 
   final arg = Get.arguments;
-  Future<void> toggleFollow() async {
-    // 1. Instantly flip the UI button state
-    isfollowing.toggle();
-
-    // 2. Setup references for the Host (The person being watched)
-    var hostProfileRef = FirebaseFirestore.instance
-        .collection("userProfile")
-        .doc(arg["uid"]);
-    var hostFollowersSub = hostProfileRef
-        .collection("Followers")
-        .doc(currenduser);
-
-    // 3. Setup references for Me (The person watching)
-    var myProfileRef = FirebaseFirestore.instance
-        .collection("userProfile")
-        .doc(currenduser);
-    var myFollowingSub = myProfileRef.collection("Following").doc(arg["uid"]);
-
-    try {
-      if (isfollowing.value) {
-        // --- ACTION: FOLLOW ---
-
-        var mydoc = await FirebaseFirestore.instance
-            .collection("userProfile")
-            .doc(currenduser)
-            .get();
-        if (!mydoc.exists) return;
-        var mydata = mydoc.data();
-        // Add me to the Host's "Followers" list
-        await hostFollowersSub.set({
-          "followername": mydata!["name"] ?? "no name",
-          "followerimage": mydata["userimage"] ?? "",
-          "followerId": currenduser,
-          "followAt": FieldValue.serverTimestamp(),
-          "userUid": currenduser,
-        });
-        // Add the Host to my "Following" list
-        await myFollowingSub.set({
-          "hostId": arg["uid"],
-          "hostname": arg["hostname"],
-          "hostimage": arg["image"],
-          "followAt": FieldValue.serverTimestamp(),
-        });
-
-        // Update the totals on the main profile documents (Safe create if missing)
-        await hostProfileRef.set({
-          "totalFollowers": FieldValue.increment(1),
-        }, SetOptions(merge: true));
-        await myProfileRef.set({
-          "totalFollowing": FieldValue.increment(1),
-        }, SetOptions(merge: true));
-      } else {
-        // --- ACTION: UNFOLLOW ---
-        await hostFollowersSub.delete();
-        await myFollowingSub.delete();
-
-        // Get the current count first to make sure we don't go below 0
-        var hostDoc = await hostProfileRef.get();
-        int currentHostFollowers = hostDoc.data()?['totalFollowers'] ?? 0;
-
-        // Only decrement if the count is greater than 0
-        if (currentHostFollowers > 0) {
-          await hostProfileRef.set({
-            "totalFollowers": FieldValue.increment(-1),
-          }, SetOptions(merge: true));
-        } else {
-          // If it's already 0 or negative, force it to stay at 0
-          await hostProfileRef.set({
-            "totalFollowers": 0,
-          }, SetOptions(merge: true));
-        }
-
-        // Do the same for your "following" count
-        var myDoc = await myProfileRef.get();
-        int currentMyFollowing = myDoc.data()?['totalFollowing'] ?? 0;
-
-        if (currentMyFollowing > 0) {
-          await myProfileRef.set({
-            "totalFollowing": FieldValue.increment(-1),
-          }, SetOptions(merge: true));
-        } else {
-          await myProfileRef.set({
-            "totalFollowing": 0,
-          }, SetOptions(merge: true));
-        }
-      }
-    } catch (e) {
-      // If something goes wrong (no internet, etc), flip the button back
-      isfollowing.toggle();
-      debugPrint("Follow Error: $e");
-    }
-  }
 
   Future<void> checkFollowers() async {
     var doc = await FirebaseFirestore.instance
