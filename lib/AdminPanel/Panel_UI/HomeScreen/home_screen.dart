@@ -124,7 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Expanded(
                                 child: DecoratedBox(
-                                  decoration: BoxDecoration(color: Colors.blue),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
                                   child: Text(
                                     data["hostname"] ?? "Guest",
                                     maxLines: 2,
@@ -140,14 +143,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               Gap(5),
 
                               Spacer(),
-                              Icon(Icons.remove_red_eye, color: Colors.red),
+                              Icon(Icons.remove_red_eye, color: Colors.black),
                               Gap(3),
-                              Text(
-                                (data["views"] ?? 0).toString(),
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.green,
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(
+                                  (data["views"] ?? 0).toString(),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ],
