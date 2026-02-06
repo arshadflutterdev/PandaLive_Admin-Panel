@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class AppUsersScreen extends StatefulWidget {
   const AppUsersScreen({super.key});
@@ -102,7 +103,8 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                 backgroundColor: Colors.white,
                                 backgroundImage: userdata["userimage"] != null
                                     ? NetworkImage(userdata["userimage"])
-                                    : AssetImage("") as ImageProvider,
+                                    : AssetImage(AppImages.user)
+                                          as ImageProvider,
                               ),
                               title: Text(
                                 userdata["name"] ?? "no name",

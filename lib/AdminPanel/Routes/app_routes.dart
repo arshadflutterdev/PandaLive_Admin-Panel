@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:panda_adminpanel/AdminPanel/Authentication/login_screen.dart';
+import 'package:panda_adminpanel/AdminPanel/Bindings/app_bindings.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
@@ -29,6 +30,10 @@ class AppRoutes {
     GetPage(name: users, page: () => AppUsersScreen()),
     GetPage(name: wallet, page: () => WalletScreen()),
     GetPage(name: me, page: () => AboutMe()),
-    GetPage(name: watchstream, page: () => WatchstreamingClass()),
+    GetPage(
+      name: watchstream,
+      binding: AppBindings(),
+      page: () => WatchstreamingClass(),
+    ),
   ];
 }
