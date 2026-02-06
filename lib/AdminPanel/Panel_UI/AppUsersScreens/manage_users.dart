@@ -14,6 +14,70 @@ class ManageUsers extends StatefulWidget {
 }
 
 class _ManageUsersState extends State<ManageUsers> {
+  //Function related block a user
+
+  Future<void> blockappUser(String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("userProfile")
+          .doc(userId)
+          .update({"blockStatus": "blocked"});
+      Get.back(); // Dialog band karne ke liye
+      Get.snackbar(
+        "Blocked",
+        "User has been blocked successfully",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      e.toString();
+    }
+  }
+
+  void blockUser() {
+    Get.defaultDialog(
+      content: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text(
+          "This user will not be able to use the app after being blocked.",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      title: "Are You Sure?",
+      backgroundColor: Colors.red,
+      titleStyle: TextStyle(color: Colors.white),
+      confirm: TextButton(
+        onPressed: () {
+          final String? userrId = user["userId"];
+          if (userrId != null && userrId.isNotEmpty) {
+            blockappUser(userrId);
+          } else {
+            Get.snackbar(
+              "Failed",
+              "Failed to Block user",
+              backgroundColor: Colors.blue,
+              colorText: Colors.white,
+            );
+          }
+        },
+        child: Text(
+          "Confirm",
+          style: TextStyle(fontSize: 16, color: Colors.white),
+        ),
+      ),
+      cancel: TextButton(
+        onPressed: () {
+          Get.back();
+        },
+        child: Text(
+          "Cancel",
+          style: TextStyle(fontSize: 17, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   //function to delete user
   Future<void> deleteAuser(String userId) async {
     try {
@@ -169,7 +233,11 @@ class _ManageUsersState extends State<ManageUsers> {
                       Text("Week Earned Coins"),
                       Spacer(),
 
-                      Text(user["coins"].toString()),
+                      Text(
+                        (user["coins"] != null)
+                            ? user["coins"].toString()
+                            : "0",
+                      ),
                     ],
                   ),
                 ),
@@ -316,7 +384,9 @@ class _ManageUsersState extends State<ManageUsers> {
                       Icon(Icons.block, color: Colors.white),
                     ],
                   ),
-                  onpressed: () {},
+                  onpressed: () {
+                    blockUser();
+                  },
                 ),
               ),
             ],
