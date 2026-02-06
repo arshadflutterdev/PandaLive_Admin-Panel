@@ -8,7 +8,6 @@ import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.da
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
-import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class SideBarScreen extends StatefulWidget {
@@ -35,13 +34,13 @@ class _SideBarScreenState extends State<SideBarScreen> {
     Icon(Icons.settings),
     Icon(CupertinoIcons.profile_circled),
   ];
-  List<String> adminScreens = [
-    AppRoutes.home,
-    AppRoutes.graph,
-    AppRoutes.setting,
-    AppRoutes.users,
-    AppRoutes.wallet,
-    AppRoutes.me,
+  List<Widget> adminScreens = [
+    HomeScreen(),
+    GraphScreen(),
+    SettingsScreen(),
+    AppUsersScreen(),
+    WalletScreen(),
+    AboutMe(),
   ];
   RxInt selectedIndex = 0.obs;
   @override
