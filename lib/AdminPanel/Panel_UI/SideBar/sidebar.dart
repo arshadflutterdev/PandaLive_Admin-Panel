@@ -36,10 +36,11 @@ class _SideBarScreenState extends State<SideBarScreen> {
   ];
   List<Widget> adminScreens = [
     HomeScreen(),
-    GraphScreen(),
-    SettingsScreen(),
     AppUsersScreen(),
+    GraphScreen(),
     WalletScreen(),
+    SettingsScreen(),
+
     AboutMe(),
   ];
   RxInt selectedIndex = 0.obs;
