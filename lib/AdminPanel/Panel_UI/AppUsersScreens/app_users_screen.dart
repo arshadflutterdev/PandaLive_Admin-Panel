@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
@@ -167,7 +169,12 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  onpressed: () {},
+                                  onpressed: () {
+                                    Get.toNamed(
+                                      AppRoutes.manage,
+                                      arguments: userdata,
+                                    );
+                                  },
                                 ),
                               ),
                             ),
