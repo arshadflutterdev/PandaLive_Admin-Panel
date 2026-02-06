@@ -76,17 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                       return;
                     }
-                    Get.toNamed(
-                      AppRoutes.watchstream,
-                      arguments: {
-                        "uid": data["uid"],
-                        "channelId": data["channelId"],
-                        "hostname": data["hostname"],
-                        "hostphoto": data["image"],
-                        "agoraUid":
-                            data["agoraUid"], // This is the ID we saved in GoLiveScreen
-                      },
-                    );
+                    // Get.toNamed(
+                    //   AppRoutes.watchstream,
+                    //   arguments: {
+                    //     "uid": data["uid"],
+                    //     "channelId": data["channelId"],
+                    //     "hostname": data["hostname"],
+                    //     "hostphoto": data["image"],
+                    //     "agoraUid":
+                    //         data["agoraUid"], // This is the ID we saved in GoLiveScreen
+                    //   },
+                    // );
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -123,13 +123,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  data["hostname"] ?? "Guest",
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(color: Colors.blue),
+                                  child: Text(
+                                    data["hostname"] ?? "Guest",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
