@@ -5,17 +5,20 @@ class MyTextField extends StatelessWidget {
   final Widget? prefix;
   final Widget? suffix;
   final Widget? hintText;
+  final TextEditingController? controller;
   const MyTextField({
     super.key,
     this.hintText,
     this.label,
     this.prefix,
     this.suffix,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         suffixIcon: suffix,

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -75,18 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                       return;
                     }
-                    // Get.toNamed(
-
-                    //   AppRoutes.watchstream,
-                    //   arguments: {
-                    //     "uid": data["uid"],
-                    //     "channelId": data["channelId"],
-                    //     "hostname": data["hostname"],
-                    //     "hostphoto": data["image"],
-                    //     "agoraUid":
-                    //         data["agoraUid"], // This is the ID we saved in GoLiveScreen
-                    //   },
-                    // );
+                    Get.toNamed(
+                      AppRoutes.watchstream,
+                      arguments: {
+                        "uid": data["uid"],
+                        "channelId": data["channelId"],
+                        "hostname": data["hostname"],
+                        "hostphoto": data["image"],
+                        "agoraUid":
+                            data["agoraUid"], // This is the ID we saved in GoLiveScreen
+                      },
+                    );
                   },
                   child: Container(
                     decoration: BoxDecoration(

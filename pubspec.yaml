@@ -39,6 +39,7 @@ dependencies:
   get: ^4.7.3
   gap: ^3.0.1
   cloud_firestore: ^6.1.2
+  agora_rtc_engine: ^6.5.3
 
 dev_dependencies:
   flutter_test:
