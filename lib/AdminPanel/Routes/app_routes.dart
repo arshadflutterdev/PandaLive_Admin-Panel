@@ -3,6 +3,7 @@ import 'package:panda_adminpanel/AdminPanel/Authentication/login_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Bindings/app_bindings.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
+import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/manage_users.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/watch_streamer.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String wallet = "/WalletScreen";
   static const String me = "/AboutMe";
   static const String watchstream = "/WatchstreamingClass";
+  static const String manage = "/ManageUsers";
   static final List<GetPage> routes = [
     GetPage(name: login, page: () => LoginScreen()),
     GetPage(name: home, page: () => HomeScreen()),
@@ -35,5 +37,6 @@ class AppRoutes {
       binding: AppBindings(),
       page: () => WatchstreamingClass(),
     ),
+    GetPage(name: manage, page: () => ManageUsers()),
   ];
 }
