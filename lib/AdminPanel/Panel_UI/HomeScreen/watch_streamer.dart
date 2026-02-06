@@ -234,7 +234,7 @@ class _WatchstreamingClassState extends State<WatchstreamingClass> {
                             backgroundColor: Colors.white,
                             backgroundImage: arg["image"] != null
                                 ? NetworkImage(arg["image"]) as ImageProvider
-                                : AssetImage(""),
+                                : AssetImage("assets/images/dohrda.jpeg"),
                           ),
                           Gap(5),
                           Text(
