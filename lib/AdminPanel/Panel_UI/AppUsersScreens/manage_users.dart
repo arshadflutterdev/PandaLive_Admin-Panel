@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
+import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
 
 class ManageUsers extends StatefulWidget {
   const ManageUsers({super.key});
@@ -200,6 +201,16 @@ class _ManageUsersState extends State<ManageUsers> {
                 ),
               ],
             ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
+              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
+
+              MyElevatedButton(child: Text("newbutton"), onpressed: () {}),
+            ],
           ),
         ],
       ),
