@@ -52,6 +52,7 @@ class _ManageUsersState extends State<ManageUsers> {
           final String? userrId = user["userId"];
           if (userrId != null && userrId.isNotEmpty) {
             blockappUser(userrId);
+            Get.back();
           } else {
             Get.snackbar(
               "Failed",

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
@@ -214,6 +215,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                     return ListView.builder(
                       itemCount: data.length,
                       itemBuilder: (context, index) {
+                        var doc = data[index];
                         var userdata =
                             data[index].data() as Map<String, dynamic>;
                         return Card(
@@ -285,11 +287,26 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                onpressed: () {
-                                  Get.toNamed(
-                                    AppRoutes.manage,
-                                    arguments: userdata,
-                                  );
+                                onpressed: () async {
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection("userProfile")
+                                        .doc(doc.id)
+                                        .update({
+                                          "blockStatus": FieldValue.delete(),
+                                        });
+                                    Get.snackbar(
+                                      "Unblocked",
+                                      "${userdata["name"]} is now active again!",
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.green.withOpacity(
+                                        0.8,
+                                      ),
+                                      colorText: Colors.white,
+                                    );
+                                  } catch (e) {
+                                    e.toString();
+                                  }
                                 },
                               ),
                             ),
