@@ -100,12 +100,15 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                         );
                       }
                       final data = snapshot.data!.docs;
-
+                      final filterData = data.where((doc) {
+                        var d = doc.data() as Map<String, dynamic>;
+                        return d["blockStatus"] != "blocked";
+                      }).toList();
                       return ListView.builder(
-                        itemCount: data.length,
+                        itemCount: filterData.length,
                         itemBuilder: (context, index) {
                           var userdata =
-                              data[index].data() as Map<String, dynamic>;
+                              filterData[index].data() as Map<String, dynamic>;
                           return Card(
                             color: Color(0xff0D1A63),
                             child: ListTile(
@@ -276,7 +279,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                               child: MyElevatedButton(
                                 bcolor: Colors.white,
                                 child: Text(
-                                  "Manage",
+                                  "UnBlock",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
