@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    print("here is current user Id $currentUserId");
     stableThreshold = DateTime.now().subtract(const Duration(minutes: 1));
   }
 
