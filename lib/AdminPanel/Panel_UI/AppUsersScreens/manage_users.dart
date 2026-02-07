@@ -41,12 +41,12 @@ class _ManageUsersState extends State<ManageUsers> {
         padding: EdgeInsets.all(8.0),
         child: Text(
           "This user will not be able to use the app after being blocked.",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.red),
         ),
       ),
       title: "Are You Sure?",
-      backgroundColor: Colors.red,
-      titleStyle: TextStyle(color: Colors.white),
+      backgroundColor: Colors.white,
+      titleStyle: TextStyle(color: Colors.red),
       confirm: TextButton(
         onPressed: () {
           final String? userrId = user["userId"];
@@ -63,7 +63,7 @@ class _ManageUsersState extends State<ManageUsers> {
         },
         child: Text(
           "Confirm",
-          style: TextStyle(fontSize: 16, color: Colors.white),
+          style: TextStyle(fontSize: 16, color: Colors.red),
         ),
       ),
       cancel: TextButton(
@@ -72,68 +72,13 @@ class _ManageUsersState extends State<ManageUsers> {
         },
         child: Text(
           "Cancel",
-          style: TextStyle(fontSize: 17, color: Colors.white),
+          style: TextStyle(fontSize: 17, color: Colors.green),
         ),
       ),
     );
   }
 
   //function to delete user
-  Future<void> deleteAuser(String userId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection("userProfile")
-          .doc(userId)
-          .delete();
-      Get.back();
-      Get.back();
-      Get.snackbar(
-        "Success",
-        "User Deleted Successfully",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } catch (e) {
-      e.toString();
-    }
-  }
-
-  void deleteUser() {
-    Get.defaultDialog(
-      title: "Sure to Delete the User",
-      content: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Text("You Are About To Delete an Panda Live App User"),
-      ),
-      titleStyle: const TextStyle(fontSize: 20),
-      backgroundColor: Colors.white,
-      cancel: TextButton(
-        onPressed: () => Get.back(),
-        child: const Text("Cancel"),
-      ),
-      confirm: TextButton(
-        onPressed: () {
-          // Yahan 'uid' check karein
-          final String? userId = user["userId"];
-
-          if (userId != null && userId.isNotEmpty) {
-            deleteAuser(userId); // Agar ID hai to delete function call hoga
-          } else {
-            // Agar ID nahi hai to hi ye snackbar chalna chahiye
-            Get.snackbar(
-              "Error",
-              "User ID not found in data",
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
-          }
-        },
-
-        child: const Text("Confirm", style: TextStyle(color: Colors.red)),
-      ),
-    );
-  }
 
   final Map<String, dynamic> user = Get.arguments;
   @override
@@ -336,6 +281,20 @@ class _ManageUsersState extends State<ManageUsers> {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.30,
+                    vertical: 5,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("BlockStatus"),
+                      Spacer(),
+                      Text(user["blockStatus"].toString()),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -345,28 +304,6 @@ class _ManageUsersState extends State<ManageUsers> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                height: 40,
-                child: MyElevatedButton(
-                  bcolor: Colors.white,
-                  child: Row(
-                    children: [
-                      Text(
-                        "Delete User",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Icon(Icons.delete, color: Colors.red),
-                    ],
-                  ),
-                  onpressed: () {
-                    deleteUser();
-                  },
-                ),
-              ),
-              Gap(20),
               SizedBox(
                 height: 40,
                 child: MyElevatedButton(
