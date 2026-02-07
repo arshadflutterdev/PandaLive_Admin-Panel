@@ -23,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    print("here is current user Id $currentUserId");
     stableThreshold = DateTime.now().subtract(const Duration(minutes: 1));
   }
 
@@ -77,17 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                       return;
                     }
-                    Get.toNamed(
-                      AppRoutes.watchstream,
-                      arguments: {
-                        "uid": data["uid"],
-                        "channelId": data["channelId"],
-                        "hostname": data["hostname"],
-                        "hostphoto": data["image"],
-                        "agoraUid":
-                            data["agoraUid"], // This is the ID we saved in GoLiveScreen
-                      },
-                    );
+                    // Get.toNamed(
+                    //   AppRoutes.watchstream,
+                    //   arguments: {
+                    //     "uid": data["uid"],
+                    //     "channelId": data["channelId"],
+                    //     "hostname": data["hostname"],
+                    //     "hostphoto": data["image"],
+                    //     "agoraUid":
+                    //         data["agoraUid"], // This is the ID we saved in GoLiveScreen
+                    //   },
+                    // );
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -151,12 +150,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: Text(
-                                  (data["views"] ?? 0).toString(),
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 2,
+                                  ),
+                                  child: Text(
+                                    (data["views"] ?? 0).toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
