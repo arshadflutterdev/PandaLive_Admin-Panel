@@ -22,9 +22,17 @@ class _AppUsersScreenState extends State<AppUsersScreen>
   TabController? tabController;
 
   late Stream<QuerySnapshot> userStream;
+  late Stream<QuerySnapshot> blockUsers;
   @override
   void initState() {
     super.initState();
+    //block users
+    blockUsers = FirebaseFirestore.instance
+        .collection("userProfile")
+        .where("blockStatus", isEqualTo: "blocked")
+        .snapshots();
+
+    //all users
     userStream = FirebaseFirestore.instance
         .collection("userProfile")
         .snapshots();
@@ -185,7 +193,109 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                     }
                   },
                 ),
-                Center(child: Text("2sri tab ka data")),
+                StreamBuilder(
+                  stream: blockUsers,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(color: Colors.green),
+                      );
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.docs.isEmpty) {
+                      return Center(child: Text("No Blocked User Found"));
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error Found"));
+                    }
+                    final data = snapshot.data!.docs;
+
+                    return ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        var userdata =
+                            data[index].data() as Map<String, dynamic>;
+                        return Card(
+                          color: Color(0xff0D1A63),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              child: ClipOval(
+                                child: Image.network(
+                                  (userdata["userimage"] != null &&
+                                          userdata["userimage"]
+                                              .toString()
+                                              .startsWith("http"))
+                                      ? userdata["userimage"]
+                                            .toString()
+                                            .replaceFirst("http://", "https://")
+                                      : "", // Empty string agar image na ho
+                                  fit: BoxFit.cover,
+
+                                  // width: 30,
+                                  // height: 30,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      AppImages.user,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                  // Loading ke waqt placeholder
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        );
+                                      },
+                                ),
+                              ),
+                            ),
+
+                            title: Text(
+                              userdata["name"] ?? "no name",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Text(
+                                  "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Gap(10),
+                                Text(
+                                  "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                            trailing: SizedBox(
+                              height: 45,
+                              child: MyElevatedButton(
+                                bcolor: Colors.white,
+                                child: Text(
+                                  "Manage",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onpressed: () {
+                                  Get.toNamed(
+                                    AppRoutes.manage,
+                                    arguments: userdata,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ),
