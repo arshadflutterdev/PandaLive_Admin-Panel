@@ -76,17 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                       return;
                     }
-                    // Get.toNamed(
-                    //   AppRoutes.watchstream,
-                    //   arguments: {
-                    //     "uid": data["uid"],
-                    //     "channelId": data["channelId"],
-                    //     "hostname": data["hostname"],
-                    //     "hostphoto": data["image"],
-                    //     "agoraUid":
-                    //         data["agoraUid"], // This is the ID we saved in GoLiveScreen
-                    //   },
-                    // );
+                    Get.toNamed(
+                      AppRoutes.watchstream,
+                      arguments: {
+                        "uid": data["uid"],
+                        "channelId": data["channelId"],
+                        "hostname": data["hostname"],
+                        "hostphoto": data["image"],
+                        "agoraUid":
+                            data["agoraUid"], // This is the ID we saved in GoLiveScreen
+                      },
+                    );
                   },
                   child: Container(
                     decoration: BoxDecoration(
