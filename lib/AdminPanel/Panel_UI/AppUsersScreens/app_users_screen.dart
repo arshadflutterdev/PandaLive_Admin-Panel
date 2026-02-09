@@ -219,7 +219,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                           color: Color(0xff0D1A63),
                           child: ListTile(
                             leading: CircleAvatar(
-                              radius: 30,
+                              radius: 25,
                               backgroundColor: Colors.white,
                               child: ClipOval(
                                 child: Image.network(
@@ -266,9 +266,9 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                   "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                Gap(10),
+                                Gap(3),
                                 Text(
-                                  "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
+                                  "Follower ${userdata["totalFollowers"] ?? "0".toString()}",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],
