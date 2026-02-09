@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else {
             final docs = snapshot.data?.docs ?? [];
             if (docs.isEmpty) {
-              return Center(child: Text("No one Live NOw"));
+              return Center(child: Text("no live".tr));
             }
             return GridView.builder(
               itemCount: docs.length,

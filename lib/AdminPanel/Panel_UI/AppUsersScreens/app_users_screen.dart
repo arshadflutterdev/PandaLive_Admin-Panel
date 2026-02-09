@@ -76,8 +76,8 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                 unselectedLabelStyle: TextStyle(color: Colors.black),
 
                 tabs: [
-                  Text("Total App Users", style: TextStyle(fontSize: 18)),
-                  Text("Blocked Users", style: TextStyle(fontSize: 18)),
+                  Text("totaluser".tr, style: TextStyle(fontSize: 18)),
+                  Text("blockuser".tr, style: TextStyle(fontSize: 18)),
                 ],
               ),
             ),
@@ -162,12 +162,12 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                               subtitle: Row(
                                 children: [
                                   Text(
-                                    "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
+                                    "follow ${userdata["totalFollowing"] ?? "0".toString().tr}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   Gap(3),
                                   Text(
-                                    "Follower ${userdata["totalFollowers"] ?? "0".toString()}",
+                                    "follower ${userdata["totalFollowers"] ?? "0".toString().tr}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
@@ -180,7 +180,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                   );
                                 },
                                 child: Text(
-                                  "Manage",
+                                  "manage".tr,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
