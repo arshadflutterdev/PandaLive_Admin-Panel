@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/state_manager.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/AboutMeScreens/about_me.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
-import 'package:panda_adminpanel/AdminPanel/Panel_UI/GraphScreen/graph_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
@@ -18,18 +15,18 @@ class SideBarScreen extends StatefulWidget {
 }
 
 class _SideBarScreenState extends State<SideBarScreen> {
-  List<String> tabNames = ["Home", "AppUsers", "Graph", "Wallet", "Settings"];
+  List<String> tabNames = ["Home", "AppUsers", "Wallet", "Settings"];
   List<Icon> tabIcons = [
     Icon(Icons.home),
     Icon(Icons.group),
-    Icon(Icons.auto_graph),
+
     Icon(Icons.wallet),
     Icon(Icons.settings),
   ];
   List<Widget> adminScreens = [
     HomeScreen(),
     AppUsersScreen(),
-    GraphScreen(),
+
     WalletScreen(),
     SettingsScreen(),
   ];
@@ -124,6 +121,7 @@ class _SideBarScreenState extends State<SideBarScreen> {
               ],
             ),
           ),
+
           Expanded(
             child: Container(
               color: Colors.white,
