@@ -41,16 +41,27 @@ class _SideBarScreenState extends State<SideBarScreen> {
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           backgroundColor: Color(0xff0D1A63),
-currentIndex: selectedIndex.value,
-          selectedItemColor: Colors.white,
+          currentIndex: selectedIndex.value,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.amber,
+          unselectedItemColor: Colors.white,
           onTap: (index) {
-            selectedIndex.value=index;
+            selectedIndex.value = index;
           },
           items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_filled),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.group),
+              label: "ManageUsers",
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: "Wallet"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: "Settings",
+            ),
           ],
         ),
       ),
