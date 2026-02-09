@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColours.bg,
-
       body: StreamBuilder<QuerySnapshot>(
         stream: liveStream
             .where("uid", isNotEqualTo: currentUserId)
