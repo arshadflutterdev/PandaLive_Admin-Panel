@@ -29,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+
     final width = MediaQuery.of(context).size.width;
+    bool isArabic = Get.locale?.languageCode == "ar";
 
     return Scaffold(
       backgroundColor: AppColours.bg,
@@ -67,8 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     if (data["agoraUid"] == null) {
                       Get.snackbar(
-                        "Wait",
-                        "Host is still connecting...",
+                        "",
+                        titleText: Text(isArabic ? "انتظر" : "Wait"),
+                        messageText: Text(
+                          isArabic
+                              ? "المضيف لا يزال متصلا"
+                              : "Host is still connecting",
+                        ),
+                        "",
                         backgroundColor: Colors.black87,
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,

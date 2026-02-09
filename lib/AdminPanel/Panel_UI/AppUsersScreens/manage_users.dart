@@ -18,6 +18,7 @@ class _ManageUsersState extends State<ManageUsers> {
   //Function related block a user
 
   Future<void> blockappUser(String userId) async {
+    bool isArabic = Get.locale?.languageCode == "ar";
     try {
       await FirebaseFirestore.instance
           .collection("userProfile")
@@ -25,8 +26,14 @@ class _ManageUsersState extends State<ManageUsers> {
           .update({"blockStatus": "blocked"});
       Get.back(); // Dialog band karne ke liye
       Get.snackbar(
-        "Blocked",
-        "User has been blocked successfully",
+        titleText: Text(isArabic ? "محظور" : "Blocked"),
+        "",
+        "",
+        messageText: Text(
+          isArabic
+              ? "تم حظر المستخدم بنجاح"
+              : "User has been blocked successfully",
+        ),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.orange,
         colorText: Colors.white,
@@ -37,15 +44,18 @@ class _ManageUsersState extends State<ManageUsers> {
   }
 
   void blockUser() {
+    bool isArabics = Get.locale?.languageCode == "ar";
     Get.defaultDialog(
-      content: const Padding(
+      content: Padding(
         padding: EdgeInsets.all(8.0),
         child: Text(
-          "This user will not be able to use the app after being blocked.",
+          isArabics
+              ? "لن يتمكن هذا المستخدم من استخدام التطبيق بعد حظره."
+              : "This user will not be able to use the app after being blocked.",
           style: TextStyle(color: Colors.red),
         ),
       ),
-      title: "Are You Sure?",
+      title: isArabics ? "Are You Sure?" : "هل أنت متأكد؟",
       backgroundColor: Colors.white,
       titleStyle: TextStyle(color: Colors.red),
       confirm: TextButton(
@@ -56,15 +66,19 @@ class _ManageUsersState extends State<ManageUsers> {
             Get.back();
           } else {
             Get.snackbar(
-              "Failed",
-              "Failed to Block user",
+              "",
+              titleText: Text(isArabics ? "فشل" : "Failed"),
+              "",
+              messageText: Text(
+                isArabics ? "فشل حظر المستخدم" : "Failed to Block user",
+              ),
               backgroundColor: Colors.blue,
               colorText: Colors.white,
             );
           }
         },
         child: Text(
-          "Confirm",
+          isArabics ? "يتأكد" : "Confirm",
           style: TextStyle(fontSize: 16, color: Colors.red),
         ),
       ),
@@ -73,7 +87,7 @@ class _ManageUsersState extends State<ManageUsers> {
           Get.back();
         },
         child: Text(
-          "Cancel",
+          isArabics ? "يلغي" : "Cancel",
           style: TextStyle(fontSize: 17, color: Colors.green),
         ),
       ),
