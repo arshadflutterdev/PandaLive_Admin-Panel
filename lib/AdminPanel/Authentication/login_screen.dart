@@ -38,19 +38,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
           Gap(10),
           Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: MyTextField(label: Text("Email Address")),
+              ),
+            ),
+          ),
+          Gap(15),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: SizedBox(
-              width: kIsWeb ? width * 0.30 : width * 0.90,
-              child: MyTextField(label: Text("Email Address")),
+              width: double.infinity,
+              child: MyTextField(label: Text("Password")),
             ),
           ),
           Gap(15),
           SizedBox(
-            width: kIsWeb ? width * 0.30 : 50,
-            child: MyTextField(label: Text("Password")),
-          ),
-          Gap(15),
-          SizedBox(
-            height: 40,
+            height: 45,
             child: MyElevatedButton(
               bcolor: Color(0xFF1E3A8A),
               onpressed: () {
