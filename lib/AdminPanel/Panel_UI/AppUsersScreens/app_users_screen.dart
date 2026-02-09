@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
@@ -77,8 +78,18 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                 unselectedLabelStyle: TextStyle(color: Colors.black),
 
                 tabs: [
-                  Text("totaluser".tr, style: TextStyle(fontSize: 18)),
-                  Text("blockuser".tr, style: TextStyle(fontSize: 18)),
+                  Text(
+                    "totaluser".tr,
+                    style: isArabic
+                        ? GoogleFonts.amiri()
+                        : TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    "blockuser".tr,
+                    style: isArabic
+                        ? GoogleFonts.amiri()
+                        : TextStyle(fontSize: 18),
+                  ),
                 ],
               ),
             ),
@@ -164,12 +175,16 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                 children: [
                                   Text(
                                     "${"follow".tr} ${userdata["totalFollowing"] ?? "0".toString()}",
-                                    style: TextStyle(color: Colors.white),
+                                    style: isArabic
+                                        ? GoogleFonts.amiri(color: Colors.white)
+                                        : TextStyle(color: Colors.white),
                                   ),
-                                  Gap(3),
+                                  Gap(isArabic ? 8 : 3),
                                   Text(
                                     "${"follower".tr} ${userdata["totalFollowers"] ?? "0".toString()}",
-                                    style: TextStyle(color: Colors.white),
+                                    style: isArabic
+                                        ? GoogleFonts.amiri(color: Colors.white)
+                                        : TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
@@ -182,10 +197,15 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                 },
                                 child: Text(
                                   "manage".tr,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                  style: isArabic
+                                      ? GoogleFonts.amiri(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        )
+                                      : TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                 ),
                               ),
                             ),
@@ -265,12 +285,16 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                               children: [
                                 Text(
                                   "${"follow".tr} ${userdata["totalFollowing"] ?? "0".toString()}",
-                                  style: TextStyle(color: Colors.white),
+                                  style: isArabic
+                                      ? GoogleFonts.amiri(color: Colors.white)
+                                      : TextStyle(color: Colors.white),
                                 ),
-                                Gap(3),
+                                Gap(isArabic ? 8 : 3),
                                 Text(
                                   "${"follower".tr} ${userdata["totalFollowers"] ?? "0".toString()}",
-                                  style: TextStyle(color: Colors.white),
+                                  style: isArabic
+                                      ? GoogleFonts.amiri(color: Colors.white)
+                                      : TextStyle(color: Colors.white),
                                 ),
                               ],
                             ),
@@ -297,11 +321,16 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                 }
                               },
                               child: Text(
-                                "Unblock",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                                "unblock".tr,
+                                style: isArabic
+                                    ? GoogleFonts.amiri(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      )
+                                    : TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
                               ),
                             ),
                           ),

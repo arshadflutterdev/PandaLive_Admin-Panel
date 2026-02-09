@@ -14,6 +14,7 @@ class AppLanguage extends Translations {
       "follower": "Follower",
       "manage": 'Manage',
       "blockuser": "Blocked Users",
+      "unblock": "Unblock",
     },
     "ar_UE": {
       "home": "الرئيسية",
@@ -26,6 +27,7 @@ class AppLanguage extends Translations {
       "follower": "تابع",
       "manage": "يدير",
       "blockuser": "المستخدمون المحظورون",
+      "unblock": "إلغاء الحظر",
     },
   };
 }
