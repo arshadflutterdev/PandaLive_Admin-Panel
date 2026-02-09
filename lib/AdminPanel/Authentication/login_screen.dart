@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
@@ -19,7 +21,19 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    bool isArabic = Get.locale?.languageCode == "ar";
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColours.bg,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.toNamed(AppRoutes.setting);
+            },
+            icon: Icon(Icons.language),
+          ),
+        ],
+      ),
       backgroundColor: AppColours.bg,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -27,13 +41,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
         children: [
           Text(
-            "Welcome Back",
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+            "welcomeback".tr,
+            style: isArabic
+                ? GoogleFonts.amiri(fontSize: 30, fontWeight: FontWeight.w800)
+                : TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
           ),
           Gap(8),
           Text(
-            "Sign in to manage the admin dashboard",
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            "managedash".tr,
+            style: isArabic
+                ? GoogleFonts.amiri(fontSize: 16, color: Colors.grey)
+                : TextStyle(fontSize: 14, color: Colors.grey),
           ),
 
           Gap(10),
@@ -42,7 +60,12 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SizedBox(
                 width: double.infinity,
-                child: MyTextField(label: Text("Email Address")),
+                child: MyTextField(
+                  label: Text(
+                    "emailadres".tr,
+                    style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                  ),
+                ),
               ),
             ),
           ),
@@ -51,7 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: SizedBox(
               width: double.infinity,
-              child: MyTextField(label: Text("Password")),
+              child: MyTextField(
+                label: Text(
+                  "password".tr,
+                  style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                ),
+              ),
             ),
           ),
           Gap(15),
@@ -60,11 +88,13 @@ class _LoginScreenState extends State<LoginScreen> {
             child: MyElevatedButton(
               bcolor: Color(0xFF1E3A8A),
               onpressed: () {
-                Get.toNamed(AppRoutes.sidebar);
+                Get.offAllNamed(AppRoutes.sidebar);
               },
               child: Text(
-                "Login as Admin",
-                style: TextStyle(color: Colors.white),
+                "loginadmin".tr,
+                style: isArabic
+                    ? GoogleFonts.amiri(color: Colors.white)
+                    : TextStyle(color: Colors.white),
               ),
             ),
           ),

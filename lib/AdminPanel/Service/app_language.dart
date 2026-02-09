@@ -26,6 +26,11 @@ class AppLanguage extends Translations {
       "normal": "Normal",
       "blockusers": "Block User",
       "noblockuser": "No Blocked User Found",
+      "welcomeback": "Welcome Back",
+      "managedash": "Sign in to manage the admin dashboard",
+      "emailadres": "Email Address",
+      "password": "Password",
+      "loginadmin": "Login as Admin",
     },
     "ar_UE": {
       "home": "الرئيسية",
@@ -50,6 +55,11 @@ class AppLanguage extends Translations {
       "normal": "طبيعي",
       "blockusers": "كتلة المستخدم",
       "noblockuser": "لم يتم العثور على مستخدم محظور",
+      "welcomeback": "مرحبًا بعودتك",
+      "managedash": "سجّل الدخول لإدارة لوحة تحكم المسؤول",
+      "emailadres": "عنوان البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "loginadmin": "تسجيل الدخول كمسؤول",
     },
   };
 }
