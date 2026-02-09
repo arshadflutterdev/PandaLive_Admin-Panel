@@ -48,6 +48,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
 
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
+    bool isArabic = Get.locale?.languageCode == "ar";
     return Scaffold(
       backgroundColor: AppColours.bg,
       body: Column(
@@ -162,12 +163,12 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                               subtitle: Row(
                                 children: [
                                   Text(
-                                    "follow ${userdata["totalFollowing"] ?? "0".toString().tr}",
+                                    "${"follow".tr} ${userdata["totalFollowing"] ?? "0".toString()}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   Gap(3),
                                   Text(
-                                    "follower ${userdata["totalFollowers"] ?? "0".toString().tr}",
+                                    "${"follower".tr} ${userdata["totalFollowers"] ?? "0".toString()}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
@@ -263,12 +264,12 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                             subtitle: Row(
                               children: [
                                 Text(
-                                  "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
+                                  "${"follow".tr} ${userdata["totalFollowing"] ?? "0".toString()}",
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Gap(3),
                                 Text(
-                                  "Follower ${userdata["totalFollowers"] ?? "0".toString()}",
+                                  "${"follower".tr} ${userdata["totalFollowers"] ?? "0".toString()}",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ],
