@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_utils/src/extensions/export.dart';
 import 'package:get/state_manager.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
@@ -51,16 +52,16 @@ class _SideBarScreenState extends State<SideBarScreen> {
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),
-              label: "Home",
+              label: "home".tr,
             ),
+            BottomNavigationBarItem(icon: Icon(Icons.group), label: "user".tr),
             BottomNavigationBarItem(
-              icon: Icon(Icons.group),
-              label: "ManageUsers",
+              icon: Icon(Icons.wallet),
+              label: "wallet".tr,
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.wallet), label: "Wallet"),
             BottomNavigationBarItem(
               icon: Icon(Icons.language),
-              label: "Language",
+              label: "language".tr,
             ),
           ],
         ),

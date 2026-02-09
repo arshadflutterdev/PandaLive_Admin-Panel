@@ -16,6 +16,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      locale: Locale("en", "US"),
+      fallbackLocale: Locale('en', 'US'),
       debugShowCheckedModeBanner: false,
       getPages: AppRoutes.routes,
       initialRoute: AppRoutes.login,
