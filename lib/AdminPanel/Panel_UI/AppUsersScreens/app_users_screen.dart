@@ -224,7 +224,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                       );
                     } else if (!snapshot.hasData ||
                         snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text("noblockuser"));
+                      return Center(child: Text("noblockuser".tr));
                     } else if (snapshot.hasError) {
                       return Center(child: Text("Error Found"));
                     }
@@ -313,7 +313,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                     ),
                                     messageText: Text(
                                       isArabic
-                                          ? "${userdata["name"]}أصبح الآن نشطًا مرة أخرى"
+                                          ? "${userdata["name"]} أصبح الآن نشطًا مرة أخرى"
                                           : "${userdata["name"]} is now active again!",
                                     ),
 
