@@ -26,23 +26,38 @@ class _WalletScreenState extends State<WalletScreen>
         centerTitle: true,
       ),
       backgroundColor: AppColours.bg,
-      body: Container(
-        color: Colors.white,
-        height: 45,
-        child: TabBar(
-          controller: tabController,
+      body: Column(
+        children: [
+          Container(
+            color: Colors.white,
+            height: 45,
+            child: TabBar(
+              controller: tabController,
 
-          indicatorPadding: EdgeInsets.zero,
-          unselectedLabelColor: Colors.black,
-          labelColor: Colors.white,
+              indicatorPadding: EdgeInsets.zero,
+              unselectedLabelColor: Colors.black,
+              labelColor: Colors.white,
 
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicator: BoxDecoration(
-            color: Color(0xff0D1A63),
-            borderRadius: BorderRadius.circular(5),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                color: Color(0xff0D1A63),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              tabs: [Text("Request"), Text("Approved"), Text("Rejected")],
+            ),
           ),
-          tabs: [Text("Request"), Text("Approved"), Text("Rejected")],
-        ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                Center(child: Text("Arshad")),
+                Center(child: Text("Arshad")),
+
+                Center(child: Text("Arshad")),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
