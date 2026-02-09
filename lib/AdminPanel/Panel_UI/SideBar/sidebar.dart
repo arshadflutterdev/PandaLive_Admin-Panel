@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get_utils/src/extensions/export.dart';
 import 'package:get/state_manager.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/AppUsersScreens/app_users_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/home_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
@@ -36,11 +35,14 @@ class _SideBarScreenState extends State<SideBarScreen> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    bool isArabic = Get.locale?.languageCode == "ar";
 
     return Scaffold(
       backgroundColor: AppColours.bg,
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
+          selectedLabelStyle: isArabic ? GoogleFonts.amiri() : TextStyle(),
+          unselectedLabelStyle: isArabic ? GoogleFonts.amiri() : TextStyle(),
           backgroundColor: Color(0xff0D1A63),
           currentIndex: selectedIndex.value,
           type: BottomNavigationBarType.fixed,
