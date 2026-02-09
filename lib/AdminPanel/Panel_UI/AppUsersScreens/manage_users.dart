@@ -85,13 +85,14 @@ class _ManageUsersState extends State<ManageUsers> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColours.bg,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Gap(20),
+          Gap(height * 0.050),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,9 +106,9 @@ class _ManageUsersState extends State<ManageUsers> {
                   icon: Icon(Icons.arrow_back_ios_new_outlined, size: 30),
                 ),
               ),
-              Gap(width * 0.35),
+              Gap(width * 0.025),
               CircleAvatar(
-                radius: 30,
+                radius: 25,
                 backgroundColor: Colors.white,
                 child: ClipOval(
                   child: Image.network(
@@ -140,9 +141,12 @@ class _ManageUsersState extends State<ManageUsers> {
                 children: [
                   Text(
                     user["name"],
-                    style: TextStyle(fontSize: 22, letterSpacing: 2),
+                    style: TextStyle(fontSize: 18, letterSpacing: 2),
                   ),
-                  Text("Beloved Panda Live User"),
+                  Text(
+                    "Beloved Panda Live User",
+                    style: TextStyle(fontSize: 12),
+                  ),
                 ],
               ),
             ],
@@ -150,156 +154,158 @@ class _ManageUsersState extends State<ManageUsers> {
           Gap(30),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Country"),
+                        Spacer(),
+                        Text(user["country"].toString()),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Country"),
-                      Spacer(),
-                      Text(user["country"].toString()),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Week Earned Coins"),
-                      Spacer(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Week Earned Coins"),
+                        Spacer(),
 
-                      Text(
-                        (user["coins"] != null)
-                            ? user["coins"].toString()
-                            : "0",
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text("Week Earnings"), Spacer(), Text("45\$")],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-
-                          "Total Withdrawl Ammount",
+                        Text(
+                          (user["coins"] != null)
+                              ? user["coins"].toString()
+                              : "0",
                         ),
-                      ),
-                      Spacer(),
-                      Text("350\$"),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Text("Week Earnings"), Spacer(), Text("45\$")],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Gender"),
-                      Spacer(),
-                      Text(user["gender"].toString()),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+
+                            "Total Withdrawl Ammount",
+                          ),
+                        ),
+                        Spacer(),
+                        Text("350\$"),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Gender"),
+                        Spacer(),
+                        Text(user["gender"].toString()),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Followers"),
-                      Spacer(),
-                      Text(
-                        (user["totalFollowers"] != null)
-                            ? user["totalFollowers"].toString()
-                            : "0",
-                      ),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Followers"),
+                        Spacer(),
+                        Text(
+                          (user["totalFollowers"] != null)
+                              ? user["totalFollowers"].toString()
+                              : "0",
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Follow"),
+                        Spacer(),
+                        Text(
+                          (user["totalFollowing"] != null)
+                              ? user["totalFollowing"].toString()
+                              : "0",
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Follow"),
-                      Spacer(),
-                      Text(
-                        (user["totalFollowing"] != null)
-                            ? user["totalFollowing"].toString()
-                            : "0",
-                      ),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Date Of Birth"),
+                        Spacer(),
+                        Text(user["dob"].toString()),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.10,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("BlockStatus"),
+                        Spacer(),
+                        Text(user["blockStatus"].toString()),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Date Of Birth"),
-                      Spacer(),
-                      Text(user["dob"].toString()),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.30,
-                    vertical: 5,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("BlockStatus"),
-                      Spacer(),
-                      Text(user["blockStatus"].toString()),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          Gap(15),
+          Gap(25),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
