@@ -143,10 +143,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     user["name"],
                     style: TextStyle(fontSize: 18, letterSpacing: 2),
                   ),
-                  Text(
-                    "Beloved Panda Live User",
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  Text("pandauser".tr, style: TextStyle(fontSize: 12)),
                 ],
               ),
             ],
@@ -167,7 +164,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Country"),
+                        Text("country"),
                         Spacer(),
                         Text(user["country"].toString()),
                       ],
@@ -181,7 +178,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Week Earned Coins"),
+                        Text("weekcoins".tr),
                         Spacer(),
 
                         Text(
@@ -199,7 +196,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text("Week Earnings"), Spacer(), Text("45\$")],
+                      children: [Text("weekearn"), Spacer(), Text("45\$")],
                     ),
                   ),
                   Padding(
@@ -215,7 +212,7 @@ class _ManageUsersState extends State<ManageUsers> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
 
-                            "Total Withdrawl Ammount",
+                            "totalwid".tr,
                           ),
                         ),
                         Spacer(),
@@ -231,7 +228,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Gender"),
+                        Text("gender".tr),
                         Spacer(),
                         Text(user["gender"].toString()),
                       ],
@@ -245,7 +242,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Followers"),
+                        Text("follower".tr),
                         Spacer(),
                         Text(
                           (user["totalFollowers"] != null)
@@ -263,7 +260,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Follow"),
+                        Text("follow".tr),
                         Spacer(),
                         Text(
                           (user["totalFollowing"] != null)
@@ -281,7 +278,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Date Of Birth"),
+                        Text("dob".tr),
                         Spacer(),
                         Text(user["dob"].toString()),
                       ],
@@ -295,9 +292,11 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("BlockStatus"),
+                        Text("block".tr),
                         Spacer(),
-                        Text(user["blockStatus"].toString()),
+                        Text(
+                          user["blockStatus"] ?? "${"normal".tr}".toString(),
+                        ),
                       ],
                     ),
                   ),
