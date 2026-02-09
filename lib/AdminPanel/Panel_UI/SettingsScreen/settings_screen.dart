@@ -11,6 +11,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  String isSelected = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,18 +25,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(
               width: 120,
               child: MyElevatedButton(
-                onpressed: () {},
-                bcolor: Colors.white,
-                child: Text("Arabic", style: TextStyle(color: Colors.black)),
+                onpressed: () {
+                  setState(() {
+                    isSelected = "Arabic";
+                  });
+                },
+                bcolor: isSelected == "Arabic"
+                    ? Color(0xff0D1A63)
+                    : Colors.white,
+                child: Text(
+                  "Arabic",
+                  style: TextStyle(
+                    color: isSelected == "Arabic" ? Colors.white : Colors.black,
+                  ),
+                ),
               ),
             ),
             Gap(5),
             SizedBox(
               width: 120,
               child: MyElevatedButton(
-                onpressed: () {},
-                bcolor: Colors.white,
-                child: Text("English", style: TextStyle(color: Colors.black)),
+                onpressed: () {
+                  setState(() {
+                    isSelected = "English";
+                  });
+                },
+                bcolor: isSelected == "English"
+                    ? Color(0xff0D1A63)
+                    : Colors.white,
+                child: Text(
+                  "English",
+                  style: TextStyle(
+                    color: isSelected == "English"
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                ),
               ),
             ),
           ],
