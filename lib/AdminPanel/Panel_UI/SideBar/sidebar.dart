@@ -26,7 +26,6 @@ class _SideBarScreenState extends State<SideBarScreen> {
   List<Widget> adminScreens = [
     HomeScreen(),
     AppUsersScreen(),
-
     WalletScreen(),
     SettingsScreen(),
   ];
@@ -38,18 +37,20 @@ class _SideBarScreenState extends State<SideBarScreen> {
 
     return Scaffold(
       backgroundColor: AppColours.bg,
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xff0D1A63),
+      bottomNavigationBar: Obx(
+        () => BottomNavigationBar(
+          backgroundColor: Color(0xff0D1A63),
 
-        selectedItemColor: Colors.white,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        ],
+          selectedItemColor: Colors.white,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          ],
+        ),
       ),
-      body: adminScreens[selectedIndex.value],
+      body: Obx(() => adminScreens[selectedIndex.value]),
     );
   }
 }
