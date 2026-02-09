@@ -308,8 +308,17 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                         "blockStatus": FieldValue.delete(),
                                       });
                                   Get.snackbar(
-                                    "Unblocked",
-                                    "${userdata["name"]} is now active again!",
+                                    titleText: Text(
+                                      isArabic ? "غير محظور" : "Unblocked",
+                                    ),
+                                    messageText: Text(
+                                      isArabic
+                                          ? "${userdata["name"]}أصبح الآن نشطًا مرة أخرى"
+                                          : "${userdata["name"]} is now active again!",
+                                    ),
+
+                                    "",
+                                    "",
                                     snackPosition: SnackPosition.BOTTOM,
                                     backgroundColor: Colors.green.withOpacity(
                                       0.8,
