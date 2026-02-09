@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
+import 'package:panda_adminpanel/AdminPanel/Service/app_language.dart';
 import 'package:panda_adminpanel/firebase_options.dart';
 import 'package:get/get.dart';
 
@@ -16,8 +17,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      translations: AppLanguage(),
       locale: Locale("en", "US"),
-      fallbackLocale: Locale('en', 'US'),
+      fallbackLocale: Locale('ar', 'UE'),
       debugShowCheckedModeBanner: false,
       getPages: AppRoutes.routes,
       initialRoute: AppRoutes.login,
