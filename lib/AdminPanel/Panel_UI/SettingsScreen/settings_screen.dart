@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:get/utils.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
 
@@ -11,7 +13,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String isSelected = "English";
+  String isSelected = "English".tr;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,16 +29,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: MyElevatedButton(
                 onpressed: () {
                   setState(() {
-                    isSelected = "Arabic";
+                    Get.updateLocale(const Locale('ar', 'AE'));
+                    isSelected = "Arabic".tr;
                   });
                 },
-                bcolor: isSelected == "Arabic"
+                bcolor: isSelected == "Arabic".tr
                     ? Color(0xff0D1A63)
                     : Colors.white,
                 child: Text(
-                  "Arabic",
+                  "Arabic".tr,
                   style: TextStyle(
-                    color: isSelected == "Arabic" ? Colors.white : Colors.black,
+                    color: isSelected == "Arabic".tr
+                        ? Colors.white
+                        : Colors.black,
                   ),
                 ),
               ),
@@ -46,17 +51,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 120,
               child: MyElevatedButton(
                 onpressed: () {
+                  Get.updateLocale(const Locale('en', 'US'));
                   setState(() {
-                    isSelected = "English";
+                    isSelected = "English".tr;
                   });
                 },
-                bcolor: isSelected == "English"
+                bcolor: isSelected == "English".tr
                     ? Color(0xff0D1A63)
                     : Colors.white,
                 child: Text(
-                  "English",
+                  "English".tr,
                   style: TextStyle(
-                    color: isSelected == "English"
+                    color: isSelected == "English".tr
                         ? Colors.white
                         : Colors.black,
                   ),
