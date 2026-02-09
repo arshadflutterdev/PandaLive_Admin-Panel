@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/state_manager.dart';
@@ -40,8 +41,11 @@ class _SideBarScreenState extends State<SideBarScreen> {
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           backgroundColor: Color(0xff0D1A63),
-
+currentIndex: selectedIndex.value,
           selectedItemColor: Colors.white,
+          onTap: (index) {
+            selectedIndex.value=index;
+          },
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
