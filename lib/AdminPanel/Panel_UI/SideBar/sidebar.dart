@@ -59,8 +59,8 @@ class _SideBarScreenState extends State<SideBarScreen> {
             ),
             BottomNavigationBarItem(icon: Icon(Icons.wallet), label: "Wallet"),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Settings",
+              icon: Icon(Icons.language),
+              label: "Language",
             ),
           ],
         ),
