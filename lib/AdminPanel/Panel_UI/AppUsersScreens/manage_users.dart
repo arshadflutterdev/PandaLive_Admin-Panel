@@ -164,7 +164,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("country"),
+                        Text("country".tr),
                         Spacer(),
                         Text(user["country"].toString()),
                       ],
@@ -196,7 +196,7 @@ class _ManageUsersState extends State<ManageUsers> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text("weekearn"), Spacer(), Text("45\$")],
+                      children: [Text("weekearn".tr), Spacer(), Text("45\$")],
                     ),
                   ),
                   Padding(
