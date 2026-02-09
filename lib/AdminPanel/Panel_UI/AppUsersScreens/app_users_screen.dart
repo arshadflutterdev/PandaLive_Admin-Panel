@@ -47,14 +47,15 @@ class _AppUsersScreenState extends State<AppUsersScreen>
   }
 
   Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColours.bg,
       body: Column(
         children: [
-          Gap(5),
+          Gap(height * 0.060),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -62,8 +63,8 @@ class _AppUsersScreenState extends State<AppUsersScreen>
               ),
               height: 50,
               child: TabBar(
-                // dividerColor: Colors.black,
-                indicatorColor: Colors.red,
+                // dividerColor: Colors.red,
+                // indicatorColor: Colors.red,
                 labelColor: Colors.white,
                 controller: tabController,
                 indicator: BoxDecoration(
@@ -114,7 +115,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                             color: Color(0xff0D1A63),
                             child: ListTile(
                               leading: CircleAvatar(
-                                radius: 30,
+                                radius: 25,
                                 backgroundColor: Colors.white,
                                 child: ClipOval(
                                   child: Image.network(
@@ -164,30 +165,26 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                     "Follow ${userdata["totalFollowing"] ?? "0".toString()}",
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  Gap(10),
+                                  Gap(3),
                                   Text(
-                                    "Followers ${userdata["totalFollowers"] ?? "0".toString()}",
+                                    "Follower ${userdata["totalFollowers"] ?? "0".toString()}",
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
                               ),
-                              trailing: SizedBox(
-                                height: 45,
-                                child: MyElevatedButton(
-                                  bcolor: Colors.white,
-                                  child: Text(
-                                    "Manage",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              trailing: TextButton(
+                                onPressed: () {
+                                  Get.toNamed(
+                                    AppRoutes.manage,
+                                    arguments: userdata,
+                                  );
+                                },
+                                child: Text(
+                                  "Manage",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                  onpressed: () {
-                                    Get.toNamed(
-                                      AppRoutes.manage,
-                                      arguments: userdata,
-                                    );
-                                  },
                                 ),
                               ),
                             ),
