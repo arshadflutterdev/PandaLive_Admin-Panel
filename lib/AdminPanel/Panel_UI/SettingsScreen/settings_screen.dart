@@ -19,16 +19,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print("congratulation your language is store");
   }
 
-  String isSelected = "English".tr;
+  void loadSelectedLanguage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lang = prefs.getString("language"); // 'ar' ya 'en'
+
+    setState(() {
+      if (lang == 'ar') {
+        isSelected = "Arabic".tr;
+      } else {
+        isSelected = "English".tr;
+      }
+    });
+  }
+
+  String isSelected = "".tr;
+  @override
+  void initState() {
+    super.initState();
+    loadSelectedLanguage();
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isArabic = Get.locale?.languageCode == "ar";
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Choice Your Favourite Language"),
+            Text(
+              isArabic ? "اختر لغتك المفضلة" : "Choice Your Favourite Language",
+            ),
             Gap(10),
             SizedBox(
               width: 120,
