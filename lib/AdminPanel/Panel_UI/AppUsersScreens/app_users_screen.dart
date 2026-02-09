@@ -273,38 +273,34 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                                 ),
                               ],
                             ),
-                            trailing: SizedBox(
-                              height: 45,
-                              child: MyElevatedButton(
-                                bcolor: Colors.white,
-                                child: Text(
-                                  "UnBlock",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                            trailing: TextButton(
+                              onPressed: () async {
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection("userProfile")
+                                      .doc(doc.id)
+                                      .update({
+                                        "blockStatus": FieldValue.delete(),
+                                      });
+                                  Get.snackbar(
+                                    "Unblocked",
+                                    "${userdata["name"]} is now active again!",
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.green.withOpacity(
+                                      0.8,
+                                    ),
+                                    colorText: Colors.white,
+                                  );
+                                } catch (e) {
+                                  e.toString();
+                                }
+                              },
+                              child: Text(
+                                "Unblock",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
-                                onpressed: () async {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection("userProfile")
-                                        .doc(doc.id)
-                                        .update({
-                                          "blockStatus": FieldValue.delete(),
-                                        });
-                                    Get.snackbar(
-                                      "Unblocked",
-                                      "${userdata["name"]} is now active again!",
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: Colors.green.withOpacity(
-                                        0.8,
-                                      ),
-                                      colorText: Colors.white,
-                                    );
-                                  } catch (e) {
-                                    e.toString();
-                                  }
-                                },
                               ),
                             ),
                           ),
