@@ -24,6 +24,8 @@ class AppLanguage extends Translations {
       "dob": "Date Of Birth",
       "block": "BlockStatus",
       "normal": "Normal",
+      "blockusers": "Block User",
+      "noblockuser": "No Blocked User Found",
     },
     "ar_UE": {
       "home": "الرئيسية",
@@ -46,6 +48,8 @@ class AppLanguage extends Translations {
       "dob": "تاريخ الميلاد",
       "block": "حالة الحظر",
       "normal": "طبيعي",
+      "blockusers": "كتلة المستخدم",
+      "noblockuser": "لم يتم العثور على مستخدم محظور",
     },
   };
 }

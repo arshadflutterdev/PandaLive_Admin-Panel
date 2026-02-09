@@ -224,7 +224,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                       );
                     } else if (!snapshot.hasData ||
                         snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text("No Blocked User Found"));
+                      return Center(child: Text("noblockuser"));
                     } else if (snapshot.hasError) {
                       return Center(child: Text("Error Found"));
                     }

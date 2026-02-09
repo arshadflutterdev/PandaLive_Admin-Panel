@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
@@ -86,6 +87,7 @@ class _ManageUsersState extends State<ManageUsers> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+    bool isArabic = Get.locale?.languageCode == "ar";
     return Scaffold(
       backgroundColor: AppColours.bg,
       body: Column(
@@ -143,7 +145,12 @@ class _ManageUsersState extends State<ManageUsers> {
                     user["name"],
                     style: TextStyle(fontSize: 18, letterSpacing: 2),
                   ),
-                  Text("pandauser".tr, style: TextStyle(fontSize: 12)),
+                  Text(
+                    "pandauser".tr,
+                    style: isArabic
+                        ? GoogleFonts.amiri(fontSize: 14)
+                        : TextStyle(fontSize: 12),
+                  ),
                 ],
               ),
             ],
@@ -164,7 +171,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("country".tr),
+                        Text(
+                          "country".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(user["country"].toString()),
                       ],
@@ -178,7 +188,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("weekcoins".tr),
+                        Text(
+                          "weekcoins".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
 
                         Text(
@@ -196,7 +209,14 @@ class _ManageUsersState extends State<ManageUsers> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text("weekearn".tr), Spacer(), Text("45\$")],
+                      children: [
+                        Text(
+                          "weekearn".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
+                        Spacer(),
+                        Text("45\$"),
+                      ],
                     ),
                   ),
                   Padding(
@@ -213,6 +233,7 @@ class _ManageUsersState extends State<ManageUsers> {
                             maxLines: 3,
 
                             "totalwid".tr,
+                            style: isArabic ? GoogleFonts.amiri() : TextStyle(),
                           ),
                         ),
                         Spacer(),
@@ -228,7 +249,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("gender".tr),
+                        Text(
+                          "gender".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(user["gender"].toString()),
                       ],
@@ -242,7 +266,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("follower".tr),
+                        Text(
+                          "follower".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(
                           (user["totalFollowers"] != null)
@@ -260,7 +287,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("follow".tr),
+                        Text(
+                          "follow".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(
                           (user["totalFollowing"] != null)
@@ -278,7 +308,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("dob".tr),
+                        Text(
+                          "dob".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(user["dob"].toString()),
                       ],
@@ -292,7 +325,10 @@ class _ManageUsersState extends State<ManageUsers> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("block".tr),
+                        Text(
+                          "block".tr,
+                          style: isArabic ? GoogleFonts.amiri() : TextStyle(),
+                        ),
                         Spacer(),
                         Text(
                           user["blockStatus"] ?? "${"normal".tr}".toString(),
@@ -317,11 +353,16 @@ class _ManageUsersState extends State<ManageUsers> {
                   child: Row(
                     children: [
                       Text(
-                        "Block User",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        "blockusers".tr,
+                        style: isArabic
+                            ? GoogleFonts.amiri(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                       ),
                       Gap(5),
                       Icon(Icons.block, color: Colors.white),
