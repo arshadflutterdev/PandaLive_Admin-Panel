@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 import 'package:panda_adminpanel/AdminPanel/Widgets/Buttons/my_elevatedbutton.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,6 +13,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  void storelanguage(String langCode) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("language", langCode);
+    print("congratulation your language is store");
+  }
+
   String isSelected = "English".tr;
   @override
   Widget build(BuildContext context) {
@@ -27,8 +34,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 120,
               child: MyElevatedButton(
                 onpressed: () {
+                  Get.updateLocale(const Locale('ar', 'AE'));
+                  storelanguage("ar");
                   setState(() {
-                    Get.updateLocale(const Locale('ar', 'AE'));
                     isSelected = "Arabic".tr;
                   });
                 },
@@ -51,6 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: MyElevatedButton(
                 onpressed: () {
                   Get.updateLocale(const Locale('en', 'US'));
+                  storelanguage("en");
                   setState(() {
                     isSelected = "English".tr;
                   });
