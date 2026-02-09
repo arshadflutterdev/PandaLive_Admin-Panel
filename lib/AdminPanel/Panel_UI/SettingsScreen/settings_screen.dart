@@ -11,7 +11,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String isSelected = "";
+  String isSelected = "English";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
