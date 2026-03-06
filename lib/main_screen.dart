@@ -38,6 +38,8 @@ class _MainScreenState extends State<MainScreen> {
                 Get.toNamed(AppRoutes.wallet);
               } else if (index == 2) {
                 Get.toNamed(AppRoutes.users);
+              } else if (index == 3) {
+                Get.toNamed(AppRoutes.setting);
               }
             },
             child: Container(
