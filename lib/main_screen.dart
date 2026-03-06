@@ -18,6 +18,18 @@ class _MainScreenState extends State<MainScreen> {
         centerTitle: true,
         backgroundColor: AppColours.bg,
       ),
+      body: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 2,
+          crossAxisSpacing: 2,
+          mainAxisSpacing: 2,
+          mainAxisExtent: 120,
+        ),
+        itemBuilder: (context, index) {
+          return Container(color: Colors.blue);
+        },
+      ),
     );
   }
 }
