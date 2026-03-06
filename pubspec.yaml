@@ -42,6 +42,7 @@ dependencies:
   agora_rtc_engine: ^6.5.3
   google_fonts: ^8.0.1
   shared_preferences: ^2.5.4
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:

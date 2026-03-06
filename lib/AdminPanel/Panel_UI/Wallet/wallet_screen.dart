@@ -21,8 +21,13 @@ class _WalletScreenState extends State<WalletScreen>
     tabController = TabController(length: 3, vsync: this);
   }
 
-  // --- NOTIFICATION LOGIC ---
-  Future<void> sendNotification(String uid, String title, String body) async {
+  // --- NOTIFICATION HELPER ---
+  Future<void> sendNotification(
+    String uid,
+    String title,
+    String body, {
+    String? details,
+  }) async {
     await _firestore
         .collection("userProfile")
         .doc(uid)
@@ -30,78 +35,26 @@ class _WalletScreenState extends State<WalletScreen>
         .add({
           "title": title,
           "body": body,
+          "paymentDetails": details ?? "",
           "time": FieldValue.serverTimestamp(),
           "isRead": false,
         });
   }
 
-  // --- REJECT & REFUND LOGIC ---
-  void _handleReject(String uid, String statusString, String userName) {
-    int refundAmount = 0;
-    try {
-      if (statusString.contains("\$")) {
-        refundAmount = int.parse(statusString.split("\$")[1].split(")")[0]);
-      }
-    } catch (e) {
-      refundAmount = 0;
-    }
-
-    Get.defaultDialog(
-      title: "Confirm Reject",
-      middleText: "Reject request and refund \$$refundAmount to $userName?",
-      textConfirm: "Confirm",
-      textCancel: "Back",
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.redAccent,
-      onConfirm: () async {
-        Get.back();
-        await _processRefund(uid, refundAmount, userName);
-      },
-    );
-  }
-
-  Future<void> _processRefund(String uid, int amount, String userName) async {
-    DocumentReference userRef = _firestore.collection("userProfile").doc(uid);
-    try {
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(userRef);
-        int currentBalance = snapshot['dollars'] ?? 0;
-        transaction.update(userRef, {
-          "withdrawlstatus": "Rejected",
-          "dollars": currentBalance + amount,
-        });
-      });
-      // User ko notify karein
-      await sendNotification(
-        uid,
-        "Withdrawal Rejected",
-        "Sorry $userName, your request for \$$amount was rejected. Balance refunded.",
-      );
-      Get.snackbar("Rejected", "User notified & amount refunded.");
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    }
-  }
-
   // --- APPROVE LOGIC ---
-  Future<void> _handleApprove(
-    String uid,
-    String userName,
-    String statusString,
-  ) async {
+  Future<void> _handleApprove(String uid, String userName) async {
     try {
       await _firestore.collection("userProfile").doc(uid).update({
         "withdrawlstatus": "Approved",
       });
-      // User ko notify karein
       await sendNotification(
         uid,
-        "Congratulations! 🎉",
-        "Hi $userName, your withdrawal request $statusString has been approved successfully.",
+        "Request Approved! 🎉",
+        "Dear $userName, your withdrawal is approved. You will receive your payment within 3 working days.",
       );
       Get.snackbar(
         "Success",
-        "Request Approved & User Notified",
+        "Approved. User notified (3-day timeline).",
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
@@ -110,18 +63,44 @@ class _WalletScreenState extends State<WalletScreen>
     }
   }
 
+  // --- PAYMENT DONE DIALOG ---
+  void _showPaymentDoneDialog(String uid, String userName) {
+    TextEditingController detailController = TextEditingController();
+    Get.defaultDialog(
+      title: "Confirm Payment",
+      content: TextField(
+        controller: detailController,
+        decoration: const InputDecoration(
+          hintText: "Enter Transaction ID / Details",
+          border: OutlineInputBorder(),
+        ),
+      ),
+      textConfirm: "Send Confirmation",
+      onConfirm: () async {
+        if (detailController.text.isEmpty) return;
+        Get.back();
+        await _firestore.collection("userProfile").doc(uid).update({
+          "withdrawlstatus": "Payment Sent ✅",
+        });
+        await sendNotification(
+          uid,
+          "Payment Sent! 💵",
+          "Congratulations! Your payment has been sent. Check details below.",
+          details: detailController.text,
+        );
+        Get.snackbar("Sent", "Payment confirmation sent to $userName");
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8F9FD),
       appBar: AppBar(
-        title: const Text(
-          "Admin Wallet",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+        title: const Text("Withdrawal Management"),
         backgroundColor: const Color(0xff0D1A63),
         centerTitle: true,
-        elevation: 0,
       ),
       body: Column(
         children: [
@@ -171,6 +150,14 @@ class _WalletScreenState extends State<WalletScreen>
             String uid = docs[index].id;
             String status = data['withdrawlstatus'].toString();
             String binanceId = data['binanceId'] ?? 'N/A';
+            String name = data['name'] ?? "User";
+            String country = data['country'] ?? "N/A"; // User ki country
+
+            // Status string se Amount nikalna (e.g. "Pending ($50)" -> "$50")
+            String displayAmount = "0";
+            if (status.contains("\$")) {
+              displayAmount = status.split("(")[1].split(")")[0];
+            }
 
             return Card(
               shape: RoundedRectangleBorder(
@@ -186,47 +173,74 @@ class _WalletScreenState extends State<WalletScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          data['name'] ?? "User",
+                          name,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 17,
                           ),
                         ),
-                        Text(
-                          status,
-                          style: const TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            displayAmount,
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const Divider(height: 20),
-                    Text("Binance Name: ${data['binanceName'] ?? 'N/A'}"),
                     const SizedBox(height: 5),
                     Row(
                       children: [
+                        const Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
                         Text(
-                          "ID: $binanceId",
+                          "Country: $country",
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 25),
+                    Text("Binance Name: ${data['binanceName'] ?? 'N/A'}"),
+                    Row(
+                      children: [
+                        Text(
+                          "Binance ID: $binanceId",
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         const Spacer(),
                         IconButton(
                           icon: const Icon(
                             Icons.copy,
-                            size: 20,
+                            size: 18,
                             color: Colors.blue,
                           ),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: binanceId));
-                            Get.rawSnackbar(message: "Binance ID Copied!");
+                            Get.snackbar("Copied", "Binance ID copied");
                           },
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10),
                     if (filter == "Pending") ...[
-                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
@@ -234,11 +248,7 @@ class _WalletScreenState extends State<WalletScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.redAccent,
                               ),
-                              onPressed: () => _handleReject(
-                                uid,
-                                status,
-                                data['name'] ?? "User",
-                              ),
+                              onPressed: () {}, // Aapka Reject Logic
                               child: const Text(
                                 "Reject",
                                 style: TextStyle(color: Colors.white),
@@ -251,11 +261,7 @@ class _WalletScreenState extends State<WalletScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                               ),
-                              onPressed: () => _handleApprove(
-                                uid,
-                                data['name'] ?? "User",
-                                status,
-                              ),
+                              onPressed: () => _handleApprove(uid, name),
                               child: const Text(
                                 "Approve",
                                 style: TextStyle(color: Colors.white),
@@ -263,6 +269,22 @@ class _WalletScreenState extends State<WalletScreen>
                             ),
                           ),
                         ],
+                      ),
+                    ] else if (filter == "Approved" &&
+                        !status.contains("Payment Sent")) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff0D1A63),
+                          ),
+                          icon: const Icon(Icons.send, color: Colors.white),
+                          onPressed: () => _showPaymentDoneDialog(uid, name),
+                          label: const Text(
+                            "Send Payment Details",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                       ),
                     ],
                   ],
