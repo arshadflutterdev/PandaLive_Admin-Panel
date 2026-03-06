@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -11,9 +13,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<String> screens = ["LiveUser", "Wallet", "Manage User", "Settings"];
-  List<Widget> Icons =[
-
+  List<String> screens = ["LiveUser", "Wallet", "ManageUser", "Settings"];
+  List<String> iconss = [
+    AppImages.livestream,
+    AppImages.wallet,
+    AppImages.manage,
+    AppImages.settings,
   ];
 
   @override
@@ -68,9 +73,14 @@ class _MainScreenState extends State<MainScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Center(
-                      child: Text(
-                        screens[index],
-                        style: TextStyle(fontSize: 18),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image(image: AssetImage(iconss[index]), height: 40),
+                          Gap(4),
+                          Text(screens[index], style: TextStyle(fontSize: 12)),
+                        ],
                       ),
                     ),
                   ],
