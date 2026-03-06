@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
-
   @override
   State<WalletScreen> createState() => _WalletScreenState();
 }
@@ -21,82 +24,65 @@ class _WalletScreenState extends State<WalletScreen>
     tabController = TabController(length: 3, vsync: this);
   }
 
-  // --- NOTIFICATION HELPER ---
-  Future<void> sendNotification(
-    String uid,
-    String title,
-    String body, {
-    String? details,
-  }) async {
+  // --- REJECT & REFUND ---
+  void _handleReject(String uid, String statusString, String userName) {
+    int amount = 0;
+    if (statusString.contains("\$"))
+      amount = int.tryParse(statusString.split("\$")[1].split(")")[0]) ?? 0;
+
+    Get.defaultDialog(
+      title: "Confirm Reject",
+      middleText: "Are you sure? \$$amount will be returned to $userName.",
+      textConfirm: "Reject & Refund",
+      buttonColor: Colors.red,
+      onConfirm: () async {
+        Get.back();
+        await _firestore.runTransaction((transaction) async {
+          DocumentSnapshot snap = await transaction.get(
+            _firestore.collection("userProfile").doc(uid),
+          );
+          transaction.update(_firestore.collection("userProfile").doc(uid), {
+            "withdrawlstatus": "Rejected",
+            "dollars": (snap['dollars'] ?? 0) + amount,
+          });
+        });
+        // Notify User
+        await _firestore
+            .collection("userProfile")
+            .doc(uid)
+            .collection("notifications")
+            .add({
+              "title": "Withdrawal Rejected",
+              "body":
+                  "Dear $userName, your withdrawal request was rejected. Your balance has been refunded.",
+              "time": FieldValue.serverTimestamp(),
+            });
+      },
+    );
+  }
+
+  // --- APPROVE ---
+  Future<void> _handleApprove(String uid, String userName) async {
+    await _firestore.collection("userProfile").doc(uid).update({
+      "withdrawlstatus": "Approved",
+    });
     await _firestore
         .collection("userProfile")
         .doc(uid)
         .collection("notifications")
         .add({
-          "title": title,
-          "body": body,
-          "paymentDetails": details ?? "",
+          "title": "Request Approved! 🎉",
+          "body":
+              "Dear $userName, your withdrawal is approved. You will receive payment within 3 working days.",
           "time": FieldValue.serverTimestamp(),
-          "isRead": false,
         });
-  }
-
-  // --- APPROVE LOGIC ---
-  Future<void> _handleApprove(String uid, String userName) async {
-    try {
-      await _firestore.collection("userProfile").doc(uid).update({
-        "withdrawlstatus": "Approved",
-      });
-      await sendNotification(
-        uid,
-        "Request Approved! 🎉",
-        "Dear $userName, your withdrawal is approved. You will receive your payment within 3 working days.",
-      );
-      Get.snackbar(
-        "Success",
-        "Approved. User notified (3-day timeline).",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    }
-  }
-
-  // --- PAYMENT DONE DIALOG ---
-  void _showPaymentDoneDialog(String uid, String userName) {
-    TextEditingController detailController = TextEditingController();
-    Get.defaultDialog(
-      title: "Confirm Payment",
-      content: TextField(
-        controller: detailController,
-        decoration: const InputDecoration(
-          hintText: "Enter Transaction ID / Details",
-          border: OutlineInputBorder(),
-        ),
-      ),
-      textConfirm: "Send Confirmation",
-      onConfirm: () async {
-        if (detailController.text.isEmpty) return;
-        Get.back();
-        await _firestore.collection("userProfile").doc(uid).update({
-          "withdrawlstatus": "Payment Sent ✅",
-        });
-        await sendNotification(
-          uid,
-          "Payment Sent! 💵",
-          "Congratulations! Your payment has been sent. Check details below.",
-          details: detailController.text,
-        );
-        Get.snackbar("Sent", "Payment confirmation sent to $userName");
-      },
-    );
+    Get.snackbar("Approved", "User notified: 3 working days timeline.");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF8F9FD),
+      backgroundColor: const Color(0xffF5F7FA),
       appBar: AppBar(
         title: const Text("Withdrawal Management"),
         backgroundColor: const Color(0xff0D1A63),
@@ -108,7 +94,6 @@ class _WalletScreenState extends State<WalletScreen>
             controller: tabController,
             labelColor: const Color(0xff0D1A63),
             unselectedLabelColor: Colors.grey,
-            indicatorColor: const Color(0xff0D1A63),
             tabs: const [
               Tab(text: "Requests"),
               Tab(text: "Approved"),
@@ -149,15 +134,9 @@ class _WalletScreenState extends State<WalletScreen>
             var data = docs[index].data() as Map<String, dynamic>;
             String uid = docs[index].id;
             String status = data['withdrawlstatus'].toString();
-            String binanceId = data['binanceId'] ?? 'N/A';
-            String name = data['name'] ?? "User";
-            String country = data['country'] ?? "N/A"; // User ki country
-
-            // Status string se Amount nikalna (e.g. "Pending ($50)" -> "$50")
-            String displayAmount = "0";
-            if (status.contains("\$")) {
-              displayAmount = status.split("(")[1].split(")")[0];
-            }
+            String amount = status.contains("\$")
+                ? status.split("(")[1].split(")")[0]
+                : "0";
 
             return Card(
               shape: RoundedRectangleBorder(
@@ -173,57 +152,41 @@ class _WalletScreenState extends State<WalletScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          name,
+                          data['name'] ?? "User",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 17,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            displayAmount,
-                            style: const TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          "Country: $country",
+                          amount,
                           style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
                       ],
                     ),
-                    const Divider(height: 25),
-                    Text("Binance Name: ${data['binanceName'] ?? 'N/A'}"),
+                    Text(
+                      "Country: ${data['country'] ?? 'N/A'}",
+                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                    const Divider(height: 20),
+                    Text("Binance ID: ${data['binanceId'] ?? 'N/A'}"),
                     Row(
                       children: [
+                        const Text(
+                          "Status: ",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         Text(
-                          "Binance ID: $binanceId",
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          status,
+                          style: TextStyle(
+                            color: status.contains("✅")
+                                ? Colors.blue
+                                : Colors.blueGrey,
+                          ),
                         ),
                         const Spacer(),
                         IconButton(
@@ -233,14 +196,16 @@ class _WalletScreenState extends State<WalletScreen>
                             color: Colors.blue,
                           ),
                           onPressed: () {
-                            Clipboard.setData(ClipboardData(text: binanceId));
-                            Get.snackbar("Copied", "Binance ID copied");
+                            Clipboard.setData(
+                              ClipboardData(text: data['binanceId'] ?? ""),
+                            );
+                            Get.snackbar("Copied", "ID Copied");
                           },
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    if (filter == "Pending") ...[
+                    if (filter == "Pending")
                       Row(
                         children: [
                           Expanded(
@@ -248,7 +213,8 @@ class _WalletScreenState extends State<WalletScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.redAccent,
                               ),
-                              onPressed: () {}, // Aapka Reject Logic
+                              onPressed: () =>
+                                  _handleReject(uid, status, data['name']),
                               child: const Text(
                                 "Reject",
                                 style: TextStyle(color: Colors.white),
@@ -261,7 +227,8 @@ class _WalletScreenState extends State<WalletScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                               ),
-                              onPressed: () => _handleApprove(uid, name),
+                              onPressed: () =>
+                                  _handleApprove(uid, data['name']),
                               child: const Text(
                                 "Approve",
                                 style: TextStyle(color: Colors.white),
@@ -269,9 +236,8 @@ class _WalletScreenState extends State<WalletScreen>
                             ),
                           ),
                         ],
-                      ),
-                    ] else if (filter == "Approved" &&
-                        !status.contains("Payment Sent")) ...[
+                      )
+                    else if (filter == "Approved")
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -279,14 +245,20 @@ class _WalletScreenState extends State<WalletScreen>
                             backgroundColor: const Color(0xff0D1A63),
                           ),
                           icon: const Icon(Icons.send, color: Colors.white),
-                          onPressed: () => _showPaymentDoneDialog(uid, name),
-                          label: const Text(
-                            "Send Payment Details",
-                            style: TextStyle(color: Colors.white),
+                          onPressed: () => Get.to(
+                            () => SendPaymentDetailsScreen(
+                              uid: uid,
+                              userName: data['name'],
+                            ),
+                          ),
+                          label: Text(
+                            status.contains("Sent")
+                                ? "Update Payment Proof"
+                                : "Send Payment Proof",
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
-                    ],
                   ],
                 ),
               ),
@@ -294,6 +266,159 @@ class _WalletScreenState extends State<WalletScreen>
           },
         );
       },
+    );
+  }
+}
+
+class SendPaymentDetailsScreen extends StatefulWidget {
+  final String uid;
+  final String userName;
+
+  const SendPaymentDetailsScreen({
+    super.key,
+    required this.uid,
+    required this.userName,
+  });
+
+  @override
+  State<SendPaymentDetailsScreen> createState() =>
+      _SendPaymentDetailsScreenState();
+}
+
+class _SendPaymentDetailsScreenState extends State<SendPaymentDetailsScreen> {
+  final TextEditingController _detailsController = TextEditingController();
+  File? _selectedImage;
+  bool _isLoading = false;
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+    if (pickedFile != null) {
+      setState(() => _selectedImage = File(pickedFile.path));
+    }
+  }
+
+  Future<void> _submitPayment() async {
+    if (_detailsController.text.isEmpty && _selectedImage == null) {
+      Get.snackbar("Error", "Please add details or a screenshot");
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      String imageUrl = "";
+      if (_selectedImage != null) {
+        var snapshot = await FirebaseStorage.instance
+            .ref(
+              'payment_proofs/${widget.uid}_${DateTime.now().millisecondsSinceEpoch}',
+            )
+            .putFile(_selectedImage!);
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
+
+      // Update status but keep in Approved list
+      await FirebaseFirestore.instance
+          .collection("userProfile")
+          .doc(widget.uid)
+          .update({
+            "withdrawlstatus": "Payment Sent ✅",
+            "paymentScreenshot": imageUrl,
+            "paymentNote": _detailsController.text,
+          });
+
+      // Send Notification with Title & Subtitle
+      await FirebaseFirestore.instance
+          .collection("userProfile")
+          .doc(widget.uid)
+          .collection("notifications")
+          .add({
+            "title": "Payment Sent! 💵",
+            "body":
+                "Congratulations ${widget.userName}! Your payment has been processed. Check the screenshot and details.",
+            "image": imageUrl,
+            "details": _detailsController.text,
+            "time": FieldValue.serverTimestamp(),
+          });
+
+      Get.back();
+      Get.snackbar(
+        "Success",
+        "Payment proof sent to ${widget.userName}",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Failed to upload: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Send Payment: ${widget.userName}"),
+        backgroundColor: const Color(0xff0D1A63),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                height: 250,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.grey[400]!),
+                ),
+                child: _selectedImage == null
+                    ? const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo, size: 50),
+                          Text("Tap to upload Screenshot"),
+                        ],
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.file(_selectedImage!, fit: BoxFit.contain),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _detailsController,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                hintText: "Enter Transaction ID or Payment Notes...",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff0D1A63),
+                ),
+                onPressed: _isLoading ? null : _submitPayment,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        "Confirm & Send Proof",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
