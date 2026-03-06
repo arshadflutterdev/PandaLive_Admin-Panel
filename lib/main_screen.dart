@@ -35,7 +35,9 @@ class _MainScreenState extends State<MainScreen> {
               if (index == 0) {
                 Get.toNamed(AppRoutes.home);
               } else if (index == 1) {
-                Get.toNamed(AppRoutes.mainscreen);
+                Get.toNamed(AppRoutes.wallet);
+              } else if (index == 2) {
+                Get.toNamed(AppRoutes.users);
               }
             },
             child: Container(
