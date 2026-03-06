@@ -11,12 +11,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<String> screens = [
-    "LiveUser",
-    "Wallet",
-    "Manage User",
-    "Settings",
-    "About me",
+  List<String> screens = ["LiveUser", "Wallet", "Manage User", "Settings"];
+  List<Widget> Icons =[
+
   ];
 
   @override
@@ -29,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: AppColours.bg,
       ),
       body: GridView.builder(
-        itemCount: 5,
+        itemCount: 4,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 2,
