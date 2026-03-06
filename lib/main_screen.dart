@@ -11,12 +11,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<String> screens = [
+    "LiveUser",
+    "Wallet",
+    "Manage User",
+    "Settings",
+    "About me",
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColours.bg,
       appBar: AppBar(
-        title: Text("Dashboard"),
+        title: Text("Admin Dashboard"),
         centerTitle: true,
         backgroundColor: AppColours.bg,
       ),
@@ -59,10 +66,14 @@ class _MainScreenState extends State<MainScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      "Sample Item ${index + 1}",
-                      style: TextStyle(fontSize: 18),
+                    Center(
+                      child: Text(
+                        screens[index],
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ],
                 ),
