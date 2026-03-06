@@ -63,7 +63,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
               ),
-              height: 50,
+              height: 45,
               child: TabBar(
                 // dividerColor: Colors.red,
                 // indicatorColor: Colors.red,
@@ -82,13 +82,13 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                     "totaluser".tr,
                     style: isArabic
                         ? GoogleFonts.amiri()
-                        : TextStyle(fontSize: 18),
+                        : TextStyle(fontSize: 16),
                   ),
                   Text(
                     "blockuser".tr,
                     style: isArabic
                         ? GoogleFonts.amiri()
-                        : TextStyle(fontSize: 18),
+                        : TextStyle(fontSize: 16),
                   ),
                 ],
               ),

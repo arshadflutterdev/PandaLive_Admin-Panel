@@ -34,6 +34,11 @@ class _HomeScreenState extends State<HomeScreen> {
     bool isArabic = Get.locale?.languageCode == "ar";
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Active Streamers"),
+        centerTitle: true,
+        backgroundColor: AppColours.bg,
+      ),
       backgroundColor: AppColours.bg,
       body: StreamBuilder<QuerySnapshot>(
         stream: liveStream
