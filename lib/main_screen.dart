@@ -19,15 +19,44 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: AppColours.bg,
       ),
       body: GridView.builder(
+        itemCount: 10,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 2,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
+          crossAxisSpacing: 10, // Grid gaps set to professional level
+          mainAxisSpacing: 10, // Grid gaps set to professional level
           mainAxisExtent: 120,
         ),
         itemBuilder: (context, index) {
-          return Container(color: Colors.blue);
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                10,
+              ), // Set to professional level corner radius
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12, // Reduced color to professional level
+                  blurRadius: 4, // Set to professional level smoothness
+                  offset: Offset(
+                    0,
+                    2,
+                  ), // Offset set to professional level shadow direction
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    "Sample Item ${index + 1}",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
