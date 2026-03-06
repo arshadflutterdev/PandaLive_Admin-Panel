@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -10,6 +11,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(backgroundColor: AppColours.bg);
   }
 }
