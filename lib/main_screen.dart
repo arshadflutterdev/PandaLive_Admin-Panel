@@ -33,7 +33,9 @@ class _MainScreenState extends State<MainScreen> {
           return GestureDetector(
             onTap: () {
               if (index == 0) {
-                Get.toNamed(AppRoutes.login);
+                Get.toNamed(AppRoutes.home);
+              } else if (index == 1) {
+                Get.toNamed(AppRoutes.mainscreen);
               }
             },
             child: Container(
