@@ -11,6 +11,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: AppColours.bg);
+    return Scaffold(
+      backgroundColor: AppColours.bg,
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        centerTitle: true,
+        backgroundColor: AppColours.bg,
+      ),
+    );
   }
 }
