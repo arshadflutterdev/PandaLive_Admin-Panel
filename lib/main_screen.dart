@@ -18,10 +18,11 @@ class _MainScreenState extends State<MainScreen> {
     "Settings",
     "About me",
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColours.bg,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Admin Dashboard"),
         centerTitle: true,
@@ -53,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColours.bg,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
