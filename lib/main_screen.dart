@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: AppColours.bg,
       ),
       body: GridView.builder(
-        itemCount: 10,
+        itemCount: 5,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           childAspectRatio: 2,
