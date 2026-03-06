@@ -10,6 +10,7 @@ import 'package:panda_adminpanel/AdminPanel/Panel_UI/HomeScreen/watch_streamer.d
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SideBar/sidebar.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
+import 'package:panda_adminpanel/main_screen.dart';
 
 class AppRoutes {
   static const String login = "/LoginScreen";
@@ -23,8 +24,10 @@ class AppRoutes {
   static const String me = "/AboutMe";
   static const String watchstream = "/WatchstreamingClass";
   static const String manage = "/ManageUsers";
+  static const String mainscreen = "/MainScreen";
   static final List<GetPage> routes = [
     GetPage(name: login, page: () => LoginScreen()),
+    GetPage(name: mainscreen, page: () => MainScreen()),
     GetPage(name: home, page: () => HomeScreen()),
     GetPage(name: sidebar, page: () => SideBarScreen()),
     GetPage(name: graph, page: () => GraphScreen()),
