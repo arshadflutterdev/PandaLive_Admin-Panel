@@ -40,6 +40,8 @@ class _MainScreenState extends State<MainScreen> {
                 Get.toNamed(AppRoutes.users);
               } else if (index == 3) {
                 Get.toNamed(AppRoutes.setting);
+              } else if (index == 4) {
+                Get.toNamed(AppRoutes.me);
               }
             },
             child: Container(
