@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     "Wallet",
     "ManageUser",
     "Settings",
-    "Announcement",
+    "Notify",
   ];
   List<String> iconss = [
     AppImages.livestream,

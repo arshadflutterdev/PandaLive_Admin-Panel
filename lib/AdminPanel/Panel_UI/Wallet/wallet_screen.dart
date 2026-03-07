@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +23,6 @@ class _WalletScreenState extends State<WalletScreen>
     tabController = TabController(length: 3, vsync: this);
   }
 
-  // --- REJECT & REFUND ---
   void _handleReject(String uid, String statusString, String userName) {
     int amount = 0;
     if (statusString.contains("\$")) {
@@ -47,7 +45,6 @@ class _WalletScreenState extends State<WalletScreen>
             "dollars": (snap['dollars'] ?? 0) + amount,
           });
         });
-        // Notify User
         await _firestore
             .collection("userProfile")
             .doc(uid)
@@ -62,7 +59,6 @@ class _WalletScreenState extends State<WalletScreen>
     );
   }
 
-  // --- APPROVE ---
   Future<void> _handleApprove(String uid, String userName) async {
     await _firestore.collection("userProfile").doc(uid).update({
       "withdrawlstatus": "Approved",
@@ -117,16 +113,29 @@ class _WalletScreenState extends State<WalletScreen>
   }
 
   Widget _buildList(String filter) {
+    bool isArabic = Get.locale?.languageCode == 'ar';
+
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore.collection("userProfile").snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return const Center(child: CircularProgressIndicator());
+
         var docs = snapshot.data!.docs.where((doc) {
           var data = doc.data() as Map<String, dynamic>;
           return data.containsKey('withdrawlstatus') &&
               data['withdrawlstatus'].toString().contains(filter);
         }).toList();
+
+        // Sorting: Newest First
+        docs.sort((a, b) {
+          var dataA = a.data() as Map<String, dynamic>;
+          var dataB = b.data() as Map<String, dynamic>;
+          Timestamp t1 = dataA['time'] ?? Timestamp.now();
+          Timestamp t2 = dataB['time'] ?? Timestamp.now();
+          return t2.compareTo(t1);
+        });
+
         if (docs.isEmpty) {
           return Center(
             child: Column(
@@ -136,10 +145,16 @@ class _WalletScreenState extends State<WalletScreen>
                 const SizedBox(height: 10),
                 Text(
                   filter == "Pending"
-                      ? "No pending requests"
+                      ? (isArabic
+                            ? "لا توجد طلبات معلقة"
+                            : "No pending requests")
                       : filter == "Approved"
-                      ? "No approved requests yet"
-                      : "No rejected requests",
+                      ? (isArabic
+                            ? "لا توجد طلبات مقبولة بعد"
+                            : "No approved requests yet")
+                      : (isArabic
+                            ? "لا توجد طلبات مرفوضة"
+                            : "No rejected requests"),
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 16,
@@ -150,6 +165,7 @@ class _WalletScreenState extends State<WalletScreen>
             ),
           );
         }
+
         return ListView.builder(
           padding: const EdgeInsets.all(12),
           itemCount: docs.length,
@@ -169,10 +185,15 @@ class _WalletScreenState extends State<WalletScreen>
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      textDirection: isArabic
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
                       children: [
                         Text(
                           data['name'] ?? "User",
@@ -192,16 +213,21 @@ class _WalletScreenState extends State<WalletScreen>
                       ],
                     ),
                     Text(
-                      "Country: ${data['country'] ?? 'N/A'}",
+                      "${isArabic ? 'الدولة' : 'Country'}: ${data['country'] ?? 'N/A'}",
                       style: const TextStyle(color: Colors.grey, fontSize: 13),
                     ),
                     const Divider(height: 20),
-                    Text("Binance ID: ${data['binanceId'] ?? 'N/A'}"),
+                    Text(
+                      "${isArabic ? 'معرف بينانس' : 'Binance ID'}: ${data['binanceId'] ?? 'N/A'}",
+                    ),
                     Row(
+                      textDirection: isArabic
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
                       children: [
-                        const Text(
-                          "Status: ",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          "${isArabic ? 'الحالة' : 'Status'}: ",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           status,
@@ -222,7 +248,10 @@ class _WalletScreenState extends State<WalletScreen>
                             Clipboard.setData(
                               ClipboardData(text: data['binanceId'] ?? ""),
                             );
-                            Get.snackbar("Copied", "ID Copied");
+                            Get.snackbar(
+                              isArabic ? "تم النسخ" : "Copied",
+                              isArabic ? "تم نسخ المعرف" : "ID Copied",
+                            );
                           },
                         ),
                       ],
@@ -238,9 +267,9 @@ class _WalletScreenState extends State<WalletScreen>
                               ),
                               onPressed: () =>
                                   _handleReject(uid, status, data['name']),
-                              child: const Text(
-                                "Reject",
-                                style: TextStyle(color: Colors.white),
+                              child: Text(
+                                isArabic ? "رفض" : "Reject",
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -252,9 +281,9 @@ class _WalletScreenState extends State<WalletScreen>
                               ),
                               onPressed: () =>
                                   _handleApprove(uid, data['name']),
-                              child: const Text(
-                                "Approve",
-                                style: TextStyle(color: Colors.white),
+                              child: Text(
+                                isArabic ? "موافقة" : "Approve",
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
@@ -276,8 +305,12 @@ class _WalletScreenState extends State<WalletScreen>
                           ),
                           label: Text(
                             status.contains("Sent")
-                                ? "Update Payment Proof"
-                                : "Send Payment Proof",
+                                ? (isArabic
+                                      ? "تحديث إثبات الدفع"
+                                      : "Update Payment Proof")
+                                : (isArabic
+                                      ? "إرسال إثبات الدفع"
+                                      : "Send Payment Proof"),
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),
@@ -296,7 +329,6 @@ class _WalletScreenState extends State<WalletScreen>
 class SendPaymentDetailsScreen extends StatefulWidget {
   final String uid;
   final String userName;
-
   const SendPaymentDetailsScreen({
     super.key,
     required this.uid,
@@ -340,7 +372,6 @@ class _SendPaymentDetailsScreenState extends State<SendPaymentDetailsScreen> {
         imageUrl = await snapshot.ref.getDownloadURL();
       }
 
-      // Update status but keep in Approved list
       await FirebaseFirestore.instance
           .collection("userProfile")
           .doc(widget.uid)
@@ -350,7 +381,6 @@ class _SendPaymentDetailsScreenState extends State<SendPaymentDetailsScreen> {
             "paymentNote": _detailsController.text,
           });
 
-      // Send Notification with Title & Subtitle
       await FirebaseFirestore.instance
           .collection("userProfile")
           .doc(widget.uid)
@@ -358,7 +388,7 @@ class _SendPaymentDetailsScreenState extends State<SendPaymentDetailsScreen> {
           .add({
             "title": "Payment Sent! 💵",
             "body":
-                "Congratulations ${widget.userName}! Your payment has been processed. Check the screenshot and details.",
+                "Congratulations ${widget.userName}! Your payment has been processed.",
             "image": imageUrl,
             "details": _detailsController.text,
             "time": FieldValue.serverTimestamp(),
@@ -367,7 +397,7 @@ class _SendPaymentDetailsScreenState extends State<SendPaymentDetailsScreen> {
       Get.back();
       Get.snackbar(
         "Success",
-        "Payment proof sent to ${widget.userName}",
+        "Payment proof sent",
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
