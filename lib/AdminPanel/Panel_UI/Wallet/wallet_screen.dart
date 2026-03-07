@@ -27,8 +27,9 @@ class _WalletScreenState extends State<WalletScreen>
   // --- REJECT & REFUND ---
   void _handleReject(String uid, String statusString, String userName) {
     int amount = 0;
-    if (statusString.contains("\$"))
+    if (statusString.contains("\$")) {
       amount = int.tryParse(statusString.split("\$")[1].split(")")[0]) ?? 0;
+    }
 
     Get.defaultDialog(
       title: "Confirm Reject",
