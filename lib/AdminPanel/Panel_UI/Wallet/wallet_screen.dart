@@ -127,7 +127,29 @@ class _WalletScreenState extends State<WalletScreen>
           return data.containsKey('withdrawlstatus') &&
               data['withdrawlstatus'].toString().contains(filter);
         }).toList();
-
+        if (docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inbox, size: 80, color: Colors.grey[300]),
+                const SizedBox(height: 10),
+                Text(
+                  filter == "Pending"
+                      ? "No pending requests"
+                      : filter == "Approved"
+                      ? "No approved requests yet"
+                      : "No rejected requests",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
         return ListView.builder(
           padding: const EdgeInsets.all(12),
           itemCount: docs.length,
