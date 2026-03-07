@@ -86,7 +86,7 @@ class _WalletScreenState extends State<WalletScreen>
       backgroundColor: const Color(0xffF5F7FA),
       appBar: AppBar(
         title: const Text("Withdrawal Management"),
-        backgroundColor: const Color(0xff0D1A63),
+        backgroundColor: Colors.white,
         centerTitle: true,
       ),
       body: Column(
