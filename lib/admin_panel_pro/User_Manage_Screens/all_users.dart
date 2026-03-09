@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/admin_panel_pro/User_Manage_Screens/user_details.dart';
 
 class AppUsersScreen extends StatefulWidget {
   const AppUsersScreen({super.key});
@@ -261,9 +262,17 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                       ),
                       DataCell(Text(_getFormattedDate(data['createdAt']))),
                       DataCell(
+                        // AppUsersScreen ke andar IconButton update karein
                         IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.remove_red_eye_sharp),
+                          onPressed: () {
+                            Get.to(
+                              () => UserPrewiew(userData: data, docId: doc.id),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.remove_red_eye_sharp,
+                            color: Color(0xFF6C63FF),
+                          ),
                         ),
                       ),
                     ],
