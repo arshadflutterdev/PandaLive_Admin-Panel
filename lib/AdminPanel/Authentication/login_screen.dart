@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // --- LEFT SIDE: EXACT IMAGE DESIGN (Shape + Text) ---
+          // --- LEFT SIDE: FIXED DESIGN ---
           if (!isMobile)
             Expanded(
               flex: 1,
@@ -30,21 +30,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Stack(
                   children: [
-                    // --- Yeh hai wo Vertical Inner Shape ---
+                    // Vertical Inner Shape
                     Align(
                       alignment: Alignment.center,
                       child: Container(
-                        width: width * 0.35, // Vertical width
-                        height:
-                            MediaQuery.of(context).size.height *
-                            0.85, // Long Vertical shape
+                        width: width * 0.35,
+                        height: MediaQuery.of(context).size.height * 0.85,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(
-                            0.15,
-                          ), // Light transparent color
-                          borderRadius: BorderRadius.circular(
-                            40,
-                          ), // Rounded corners
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(40),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.2),
                             width: 1.5,
@@ -53,27 +47,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    // --- Text on top of the shape ---
+                    // Text on top of the shape (FIXED POSITION)
                     Padding(
                       padding: const EdgeInsets.all(60.0),
-                      child: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.start, // Top se start ho
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start, // Right side aligned
-                        children: [
-                          const Gap(40),
-                          Text(
-                            "Very good\nworks are\nwaiting for\nyou Login\nNow!!!",
-                            textAlign: TextAlign.right,
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 42,
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
+                      child: SizedBox(
+                        width: double.infinity, // Ye column ko full width dega
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.end, // Right alignment
+                          children: [
+                            const Gap(40),
+                            Text(
+                              "Very good\nworks are\nwaiting for\nyou Login\nNow!!!",
+                              textAlign:
+                                  TextAlign.right, // Har line right-aligned
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
