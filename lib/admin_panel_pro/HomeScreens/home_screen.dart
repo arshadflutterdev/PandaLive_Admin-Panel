@@ -197,54 +197,57 @@ class _HomeScreenProState extends State<HomeScreenPro> {
   }
 
   Widget _buildTopHeader(bool isMobile) {
-    return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      color: Colors.white,
-      child: Row(
-        children: [
-          if (isMobile)
-            // Mobile Menu Icon
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black),
-                onPressed: () => Scaffold.of(context).openDrawer(),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Container(
+        height: 70,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        color: Colors.white,
+        child: Row(
+          children: [
+            if (isMobile)
+              // Mobile Menu Icon
+              Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.black),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              )
+            else
+              // Laptop Toggle Icon
+              IconButton(
+                icon: Icon(
+                  _isSidebarVisible ? Icons.menu_open : Icons.menu,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isSidebarVisible = !_isSidebarVisible;
+                  });
+                },
               ),
-            )
-          else
-            // Laptop Toggle Icon
-            IconButton(
-              icon: Icon(
-                _isSidebarVisible ? Icons.menu_open : Icons.menu,
-                color: Colors.grey,
+
+            const Gap(15),
+
+            // --- YE HAI AAPKA TITLE ---
+            Text(
+              "Panda  admin",
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
-              onPressed: () {
-                setState(() {
-                  _isSidebarVisible = !_isSidebarVisible;
-                });
-              },
             ),
 
-          const Gap(15),
+            const Spacer(),
 
-          // --- YE HAI AAPKA TITLE ---
-          Text(
-            "Panda Admin Panel",
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+            // Profile Icon
+            const CircleAvatar(
+              backgroundColor: Color(0xFFE3F2FD),
+              child: Icon(Icons.person, color: Color(0xFF2196F3)),
             ),
-          ),
-
-          const Spacer(),
-
-          // Profile Icon
-          const CircleAvatar(
-            backgroundColor: Color(0xFFE3F2FD),
-            child: Icon(Icons.person, color: Color(0xFF2196F3)),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
