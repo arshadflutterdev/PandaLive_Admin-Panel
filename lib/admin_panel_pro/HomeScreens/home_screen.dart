@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
+import 'package:panda_adminpanel/admin_panel_pro/DashBoard/dashboard_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/User_Manage_Screens/all_users.dart';
+import 'package:panda_adminpanel/admin_panel_pro/VerifyUsers/verifyusers_pro.dart';
 
 class HomeScreenPro extends StatefulWidget {
   const HomeScreenPro({super.key});
@@ -13,6 +16,11 @@ class HomeScreenPro extends StatefulWidget {
 class _HomeScreenProState extends State<HomeScreenPro> {
   int _selectedIndex = 0;
   bool _isSidebarVisible = true; // Laptop toggle state
+  List<Widget> appscreens = [
+    DashboardScreen(),
+    AppUsersScreen(),
+    VerifyusersPro(),
+  ];
 
   @override
   Widget build(BuildContext context) {
