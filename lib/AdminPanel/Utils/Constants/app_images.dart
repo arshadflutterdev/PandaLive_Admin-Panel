@@ -4,4 +4,5 @@ class AppImages {
   static const wallet = "assets/icons/wallet.png";
   static const manage = "assets/icons/self-development.png";
   static const settings = "assets/icons/settings.png";
+  static const liveimg = "assets/images/download (3).jpg";
 }
