@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -115,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const Gap(8),
                   MyTextField(
-                    hintText: "demo@admin.com",
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    hintText: Text("demo@admin.com"),
+                    prefix: const Icon(Icons.email_outlined),
                   ),
                   const Gap(20),
 
@@ -127,9 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const Gap(8),
                   MyTextField(
-                    hintText: "••••••••",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: const Icon(Icons.visibility_off_outlined),
+                    hintText: Text("••••••••"),
+                    prefix: const Icon(Icons.lock_outline),
+                    suffix: const Icon(Icons.visibility_off_outlined),
                   ),
                   const Gap(15),
 
