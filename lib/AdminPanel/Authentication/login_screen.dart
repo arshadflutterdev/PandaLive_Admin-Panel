@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:panda_adminpanel/AdminPanel/Widgets/Textfields/my_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,50 +12,171 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
-    // Screen ki width check karne ke liye
     final double width = MediaQuery.of(context).size.width;
-    final bool isMobile = width < 800;
-    bool isArabic = Get.locale?.languageCode == "ar";
+    // Agar screen width 900 se kam hai to mobile layout dikhayenge
+    final bool isMobile = width < 900;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // 1. Left Side Banner (Sirf Desktop/Web ke liye)
+          // --- LEFT SIDE: IMAGE/BANNER (Sirf Desktop/Web ke liye) ---
           if (!isMobile)
             Expanded(
               flex: 1,
               child: Container(
-                color: const Color(0xFF6366F1), // Purple background
-                child: Stack(
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1), // Light grey background
+                ),
+                child: Center(
+                  child: Image.network(
+                    'https://img.freepik.com/free-vector/tablet-login-concept-illustration_114360-7863.jpg',
+                    fit: BoxFit.contain,
+                    width: width * 0.4,
+                  ),
+                ),
+              ),
+            ),
+
+          // --- RIGHT SIDE: LOGIN FORM ---
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 30 : width * 0.08,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Background pattern ya image yahan lagayein
+                    // Tingle Logo (Jaisa image mein tha)
                     Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(40.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      child: Container(
+                        height: 70,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFF472B6), Color(0xFFA855F7)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(
+                          Icons.flutter_dash,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
+                    ),
+                    const Gap(30),
+
+                    Text(
+                      "Login to your account",
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const Gap(10),
+                    const Text(
+                      "Let's connect, chat, and spark real connections.",
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    const Gap(40),
+
+                    // Email Input
+                    const Text(
+                      "Enter your Email",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const Gap(8),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "demo@admin.com",
+                        prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                        ),
+                      ),
+                    ),
+                    const Gap(20),
+
+                    // Password Input
+                    const Text(
+                      "Enter your Password",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const Gap(8),
+                    TextField(
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: "••••••••",
+                        prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                        suffixIcon: const Icon(
+                          Icons.visibility_off_outlined,
+                          size: 20,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                        ),
+                      ),
+                    ),
+
+                    const Gap(15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
                           children: [
-                            Text(
-                              "Very good works are waiting for you Login Now!!!",
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Gap(20),
-                            // User Image Placeholder
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                'https://via.placeholder.com/300x400', // Apni image asset lagayein
-                                height: 400,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                            Checkbox(value: false, onChanged: (v) {}),
+                            const Text("Remember me?"),
                           ],
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            "Forgot Password?",
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(30),
+
+                    // --- ONLY ADMIN LOGIN BUTTON ---
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFF6366F1,
+                          ), // Primary Indigo color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          // Get.offAllNamed(AppRoutes.mainscreen);
+                        },
+                        child: const Text(
+                          "Admin Log In",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -64,128 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
-          // 2. Right Side Login Form
-          Expanded(
-            flex: 1,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 20 : width * 0.05,
-                vertical: 40,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Logo
-                  Center(
-                    child: Container(
-                      height: 80,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Colors.pinkAccent, Colors.purpleAccent],
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(
-                        Icons.flutter_dash,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                  const Gap(30),
-                  Text(
-                    "Login to your account",
-                    style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Gap(10),
-                  const Text(
-                    "Let's connect, chat, and spark real connections. Enter your credentials to continue your journey.",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const Gap(30),
-
-                  // Email Field
-                  const Text(
-                    "Enter your Email",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const Gap(8),
-                  MyTextField(
-                    hintText: Text("demo@admin.com"),
-                    prefix: const Icon(Icons.email_outlined),
-                  ),
-                  const Gap(20),
-
-                  // Password Field
-                  const Text(
-                    "Enter your Password",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const Gap(8),
-                  MyTextField(
-                    hintText: Text("••••••••"),
-                    prefix: const Icon(Icons.lock_outline),
-                    suffix: const Icon(Icons.visibility_off_outlined),
-                  ),
-                  const Gap(15),
-
-                  // Remember Me & Forgot Password
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(value: false, onChanged: (v) {}),
-                          const Text("Remember me?"),
-                        ],
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("Forgot Password?"),
-                      ),
-                    ],
-                  ),
-                  const Gap(30),
-
-                  // Buttons Grid
-                  GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    childAspectRatio: 3.5,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildButton("Admin Log In", const Color(0xFF6366F1)),
-                      _buildButton("Staff Log In", Colors.grey),
-                      _buildButton("Demo Log In", Colors.redAccent),
-                      _buildButton("Demo Staff Log In", Colors.orangeAccent),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildButton(String text, Color color) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      onPressed: () {},
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white, fontSize: 13),
       ),
     );
   }
