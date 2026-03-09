@@ -11,6 +11,7 @@ import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_scr
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/SideBar/sidebar.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/Wallet/wallet_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Panel_UI/notify_users.dart';
+import 'package:panda_adminpanel/admin_panel_pro/HomeScreens/home_screen.dart';
 import 'package:panda_adminpanel/main_screen.dart';
 
 class AppRoutes {
@@ -27,6 +28,9 @@ class AppRoutes {
   static const String manage = "/ManageUsers";
   static const String mainscreen = "/MainScreen";
   static const String notify = "/NotifyUsers";
+
+  //Admin Pro
+  static const homepro = "/HomeScreenPro";
   static final List<GetPage> routes = [
     GetPage(name: login, page: () => LoginScreen()),
     GetPage(name: mainscreen, page: () => MainScreen()),
@@ -44,5 +48,7 @@ class AppRoutes {
       page: () => WatchstreamingClass(),
     ),
     GetPage(name: manage, page: () => ManageUsers()),
+    //Related Pro
+    GetPage(name: homepro, page: () => HomeScreenPro()),
   ];
 }
