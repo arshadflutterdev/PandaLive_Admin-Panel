@@ -14,7 +14,7 @@ import 'package:panda_adminpanel/AdminPanel/Panel_UI/notify_users.dart';
 import 'package:panda_adminpanel/main_screen.dart';
 
 class AppRoutes {
-  static const String login = "/DashboardPage";
+  static const String login = "/LoginScreen";
   static const String home = "/HomeScreen";
   static const String sidebar = "/SideBarScreen";
   static const String graph = "/GraphScreen";
@@ -28,7 +28,7 @@ class AppRoutes {
   static const String mainscreen = "/MainScreen";
   static const String notify = "/NotifyUsers";
   static final List<GetPage> routes = [
-    GetPage(name: login, page: () => DashboardPage()),
+    GetPage(name: login, page: () => LoginScreen()),
     GetPage(name: mainscreen, page: () => MainScreen()),
     GetPage(name: home, page: () => HomeScreen()),
     GetPage(name: sidebar, page: () => SideBarScreen()),
