@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+// Note: Apne project ke mutabiq import check kar lein
+// import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,6 +11,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Remember me workable banane ke liye variable
+  bool _isRememberMe = false;
+
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
@@ -18,19 +23,19 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // --- LEFT SIDE: FIXED DESIGN ---
+          // --- LEFT SIDE: FIXED DESIGN WITH IMAGE ---
           if (!isMobile)
             Expanded(
               flex: 1,
               child: Container(
                 margin: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1), // Main Purple Background
+                  color: const Color(0xFF6366F1),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Stack(
                   children: [
-                    // Vertical Inner Shape
+                    // 1. Vertical Inner Shape
                     Align(
                       alignment: Alignment.center,
                       child: Container(
@@ -47,21 +52,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    // Text on top of the shape (FIXED POSITION)
+                    // 2. Text Content (Top Right)
                     Padding(
                       padding: const EdgeInsets.all(60.0),
                       child: SizedBox(
-                        width: double.infinity, // Ye column ko full width dega
+                        width: double.infinity,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment:
-                              CrossAxisAlignment.end, // Right alignment
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const Gap(40),
                             Text(
                               "Very good\nworks are\nwaiting for\nyou Login\nNow!!!",
-                              textAlign:
-                                  TextAlign.right, // Har line right-aligned
+                              textAlign: TextAlign.right,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 42,
@@ -71,6 +74,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+
+                    // 3. Bottom Right Image (Mukammal Design)
+                    Positioned(
+                      bottom: 40,
+                      right: 20,
+                      child: Image.asset(
+                        "assets/images/bgrm.png", // AppImages.bgrm use karein
+                        width: width * 0.3,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ],
@@ -163,7 +177,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Row(
                           children: [
-                            Checkbox(value: false, onChanged: (v) {}),
+                            // --- REMEMBER ME WORKABLE ---
+                            Checkbox(
+                              value: _isRememberMe,
+                              activeColor: const Color(0xFF6366F1),
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _isRememberMe = value ?? false;
+                                });
+                              },
+                            ),
                             const Text("Remember me?"),
                           ],
                         ),
@@ -186,7 +209,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          print("Remember Me: $_isRememberMe");
+                          // Yahan apna login logic add karein
+                        },
                         child: const Text(
                           "Admin Log In",
                           style: TextStyle(
