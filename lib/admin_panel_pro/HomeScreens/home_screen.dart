@@ -200,7 +200,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
-        height: 70,
+        height: 60,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         color: Colors.white,
         child: Row(
