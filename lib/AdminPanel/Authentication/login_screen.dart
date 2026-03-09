@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 // Note: Apne project ke mutabiq import check kar lein
 // import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
@@ -213,6 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           print("Remember Me: $_isRememberMe");
                           // Yahan apna login logic add karein
+                          Get.toNamed(AppRoutes.homepro);
                         },
                         child: const Text(
                           "Admin Log In",
