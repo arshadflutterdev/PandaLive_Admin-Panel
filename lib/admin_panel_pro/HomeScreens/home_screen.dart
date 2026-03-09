@@ -23,26 +23,15 @@ class _HomeScreenProState extends State<HomeScreenPro> {
       backgroundColor: const Color(0xFFF8F9FD),
 
       // Mobile AppBar: Builder use kiya hai taaki context ka masla na ho
-      appBar: isMobile
-          ? AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0.5,
-              leading: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.black),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
-              ),
-              title: Text(
-                "PandaLive Admin",
-                style: GoogleFonts.poppins(color: Colors.black, fontSize: 16),
-              ),
-            )
-          : null,
+      appBar: null,
 
       // Mobile Drawer
       drawer: isMobile
-          ? Drawer(width: 280, child: _buildSidebarContent(true))
+          ? Drawer(
+              width: 280,
+              child: _buildSidebarContent(true),
+              backgroundColor: Colors.white,
+            )
           : null,
 
       body: Row(
@@ -123,18 +112,12 @@ class _HomeScreenProState extends State<HomeScreenPro> {
                 isMobile,
               ),
               _sectionTitle("Reports & Requests"),
-              _navItem(
-                10,
-                Icons.currency_exchange_rounded,
-                "Support Request",
-                isMobile,
-              ),
-              _navItem(
-                11,
-                Icons.account_balance_wallet_outlined,
-                "Report",
-                isMobile,
-              ),
+              _navItem(10, Icons.help, "Support Request", isMobile),
+              _navItem(11, Icons.report, "Report", isMobile),
+              _sectionTitle("General"),
+              _navItem(12, Icons.settings, "Settings", isMobile),
+              _navItem(13, Icons.person_2_outlined, "Profile", isMobile),
+              _navItem(14, Icons.logout, "Logout", isMobile),
             ],
           ),
         ),
@@ -204,7 +187,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 10,
+          fontSize: 15,
           color: Colors.grey[500],
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -216,12 +199,20 @@ class _HomeScreenProState extends State<HomeScreenPro> {
   Widget _buildTopHeader(bool isMobile) {
     return Container(
       height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       color: Colors.white,
       child: Row(
         children: [
-          // Laptop Toggle Button
-          if (!isMobile)
+          if (isMobile)
+            // Mobile Menu Icon
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu, color: Colors.black),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            )
+          else
+            // Laptop Toggle Icon
             IconButton(
               icon: Icon(
                 _isSidebarVisible ? Icons.menu_open : Icons.menu,
@@ -233,13 +224,58 @@ class _HomeScreenProState extends State<HomeScreenPro> {
                 });
               },
             ),
+
+          const Gap(15),
+
+          // --- YE HAI AAPKA TITLE ---
+          Text(
+            "Panda Admin Panel",
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+
           const Spacer(),
+
+          // Profile Icon
           const CircleAvatar(
             backgroundColor: Color(0xFFE3F2FD),
-            child: Icon(Icons.person, color: Color(0xFF6366F1)),
+            child: Icon(Icons.person, color: Color(0xFF2196F3)),
           ),
         ],
       ),
     );
   }
+
+  // Widget _buildTopHeader(bool isMobile) {
+  //   return Container(
+  //     height: 70,
+  //     padding: const EdgeInsets.symmetric(horizontal: 30),
+  //     color: Colors.white,
+  //     child: Row(
+  //       children: [
+  //         // Laptop Toggle Button
+  //         if (!isMobile)
+  //           IconButton(
+  //             icon: Icon(
+  //               _isSidebarVisible ? Icons.menu_open : Icons.menu,
+  //               color: Colors.grey,
+  //             ),
+  //             onPressed: () {
+  //               setState(() {
+  //                 _isSidebarVisible = !_isSidebarVisible;
+  //               });
+  //             },
+  //           ),
+  //         const Spacer(),
+  //         const CircleAvatar(
+  //           backgroundColor: Color(0xFFE3F2FD),
+  //           child: Icon(Icons.person, color: Color(0xFF6366F1)),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
