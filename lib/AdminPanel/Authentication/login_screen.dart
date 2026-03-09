@@ -79,11 +79,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // 3. Bottom Right Image (Mukammal Design)
                     Positioned(
-                      bottom: 28,
-                      right: 100,
+                      bottom: 8,
+                      right: 200,
                       child: Image.asset(
                         "assets/images/bggg.png", // AppImages.bgrm use karein
                         width: width * 0.3,
+                        height: 500,
                         fit: BoxFit.contain,
                       ),
                     ),
