@@ -5,4 +5,6 @@ class AppImages {
   static const manage = "assets/icons/self-development.png";
   static const settings = "assets/icons/settings.png";
   static const liveimg = "assets/images/download (3).jpg";
+  static const bgrm =
+      "assets/images/Recursos_Gráficos_Premium-removebg-preview.png";
 }
