@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Currency_Screens/currency_screens.dart';
 import 'package:panda_adminpanel/admin_panel_pro/DashBoard/dashboard_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Gifts/gift_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/User_Manage_Screens/all_users.dart';
 import 'package:panda_adminpanel/admin_panel_pro/VerifyUsers/verifyusers_pro.dart';
 
@@ -20,6 +22,8 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     DashboardScreen(),
     AppUsersScreen(),
     VerifyusersPro(),
+    GiftScreen(),
+    CurrencyScreens(),
   ];
 
   @override
