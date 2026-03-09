@@ -7,4 +7,5 @@ class AppImages {
   static const liveimg = "assets/images/download (3).jpg";
   static const bgrm =
       "assets/images/Recursos_Gráficos_Premium-removebg-preview.png";
+  static const panda = "assets/images/pandaaaa.png";
 }

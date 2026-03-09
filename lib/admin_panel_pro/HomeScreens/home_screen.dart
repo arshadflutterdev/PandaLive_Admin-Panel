@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class HomeScreenPro extends StatefulWidget {
   const HomeScreenPro({super.key});
@@ -33,7 +34,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
                 ),
               ),
               title: Text(
-                "Shortie Admin",
+                "PandaLive Admin",
                 style: GoogleFonts.poppins(color: Colors.black, fontSize: 16),
               ),
             )
@@ -152,10 +153,10 @@ class _HomeScreenProState extends State<HomeScreenPro> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          const Icon(Icons.flash_on, color: Color(0xFF2196F3), size: 28),
+          Image(image: AssetImage(AppImages.settings), height: 20),
           const Gap(10),
           Text(
-            "Shortie",
+            "PandaLive",
             style: GoogleFonts.poppins(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -173,7 +174,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
         title,
         style: TextStyle(
           fontSize: 10,
-          color: Colors.grey[400],
+          color: Colors.grey[500],
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
         ),
@@ -204,7 +205,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
           const Spacer(),
           const CircleAvatar(
             backgroundColor: Color(0xFFE3F2FD),
-            child: Icon(Icons.person, color: Color(0xFF2196F3)),
+            child: Icon(Icons.person, color: Color(0xFF6366F1)),
           ),
         ],
       ),
