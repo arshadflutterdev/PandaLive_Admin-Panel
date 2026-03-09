@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/AdminPanel/Panel_UI/SettingsScreen/settings_screen.dart';
 import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Coins_Plans/coins_plands.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Currency_Screens/currency_screens.dart';
 import 'package:panda_adminpanel/admin_panel_pro/DashBoard/dashboard_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Gifts/gift_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/LogoutScreen/logout_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Order_History/order_history.dart';
+import 'package:panda_adminpanel/admin_panel_pro/ProfileScreen/profile_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Reports/reports_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Supports/team_support.dart';
 import 'package:panda_adminpanel/admin_panel_pro/User_Manage_Screens/all_users.dart';
 import 'package:panda_adminpanel/admin_panel_pro/VerifyUsers/verifyusers_pro.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Withdrawal_screens/withdrawal_screens.dart';
 
 class HomeScreenPro extends StatefulWidget {
   const HomeScreenPro({super.key});
@@ -24,6 +32,14 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     VerifyusersPro(),
     GiftScreen(),
     CurrencyScreens(),
+    WithdrawalScreens(),
+    CoinsPlans(),
+    OrderHistory(),
+    TeamSupport(),
+    ReportsScreen(),
+    SettingsScreen(),
+    ProfileScreen(),
+    LogoutScreen(),
   ];
 
   @override
@@ -65,14 +81,10 @@ class _HomeScreenProState extends State<HomeScreenPro> {
               children: [
                 _buildTopHeader(isMobile),
                 Expanded(
-                  child: Center(
-                    child: Text(
-                      "Page: $_selectedIndex",
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: IndexedStack(
+                    // IndexedStack use karein taaki screen state save rahe
+                    index: _selectedIndex,
+                    children: appscreens,
                   ),
                 ),
               ],
