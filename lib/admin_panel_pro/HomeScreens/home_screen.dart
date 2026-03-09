@@ -11,41 +11,56 @@ class HomeScreenPro extends StatefulWidget {
 
 class _HomeScreenProState extends State<HomeScreenPro> {
   int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    // Screen width check karne ke liye
     double screenWidth = MediaQuery.of(context).size.width;
     bool isMobile = screenWidth < 1100;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F2F7), // Background color match
-      // Mobile par AppBar aur Drawer dikhega
+      key: _scaffoldKey,
+      backgroundColor: const Color(0xFFF8F9FD),
+      // Mobile screen par AppBar aur Drawer icon show hoga
       appBar: isMobile
-          ? AppBar(backgroundColor: Colors.white, elevation: 0.5)
+          ? AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0.5,
+              leading: IconButton(
+                icon: const Icon(Icons.menu, color: Colors.black),
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+              title: Text(
+                "Shortie Admin",
+                style: GoogleFonts.poppins(color: Colors.black, fontSize: 16),
+              ),
+            )
           : null,
-      drawer: isMobile ? Drawer(child: _buildSidebarContent()) : null,
+
+      // Mobile ke liye Drawer
+      drawer: isMobile
+          ? Drawer(width: 280, child: _buildSidebarContent(isMobile))
+          : null,
 
       body: Row(
         children: [
-          // Desktop par Sidebar hamesha open (Auto Open) rahega
+          // Web/Desktop par Sidebar pehle se display hoga
           if (!isMobile)
             Container(
               width: 280,
-              color: Colors.white,
-              child: _buildSidebarContent(),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2)],
+              ),
+              child: _buildSidebarContent(isMobile),
             ),
 
-          // Main Content Area
+          // Main Screen Content
           Expanded(
             child: Column(
               children: [
-                if (!isMobile) _buildTopHeader(), // Desktop header
-                Expanded(
-                  child: Center(
-                    child: Text("Selected Page Index: $_selectedIndex"),
-                  ),
-                ),
+                if (!isMobile) _buildTopHeader(),
+                Expanded(child: _buildBodyContent()),
               ],
             ),
           ),
@@ -54,35 +69,77 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     );
   }
 
-  // Sidebar ka design (Same as your image)
-  Widget _buildSidebarContent() {
+  Widget _buildSidebarContent(bool isMobile) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Gap(30),
+        const Gap(40),
         _buildLogo(),
         const Gap(30),
         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildSectionTitle("DASHBOARD"),
-                _buildMenuItem(0, Icons.grid_view_rounded, "Dashboard"),
-                _buildSectionTitle("USER MANAGEMENT"),
-                _buildMenuItem(1, Icons.person_outline_rounded, "User"),
-                _buildMenuItem(
-                  2,
-                  Icons.verified_user_outlined,
-                  "Verification Request",
-                ),
-                _buildSectionTitle("CONTENT MANAGEMENT"),
-                _buildMenuItem(3, Icons.image_outlined, "Banner"),
-                _buildMenuItem(4, Icons.card_giftcard_rounded, "Gift"),
-              ],
-            ),
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            children: [
+              _sectionTitle("DASHBOARD"),
+              _navItem(0, Icons.grid_view_rounded, "Dashboard", isMobile),
+
+              _sectionTitle("USER MANAGEMENT"),
+              _navItem(1, Icons.people_outline_rounded, "User", isMobile),
+              _navItem(
+                2,
+                Icons.verified_user_outlined,
+                "Verification Request",
+                isMobile,
+              ),
+
+              _sectionTitle("FINANCE"),
+              _navItem(6, Icons.monetization_on_outlined, "Currency", isMobile),
+              _navItem(
+                7,
+                Icons.account_balance_wallet_outlined,
+                "Withdraw Request",
+                isMobile,
+              ),
+
+              _sectionTitle("GENERAL"),
+              _navItem(10, Icons.settings_outlined, "Setting", isMobile),
+              _navItem(11, Icons.person_outline_rounded, "Profile", isMobile),
+              _navItem(12, Icons.logout_rounded, "Logout", isMobile),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _navItem(int index, IconData icon, String label, bool isMobile) {
+    bool isSelected = _selectedIndex == index;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 5),
+      child: ListTile(
+        onTap: () {
+          setState(() => _selectedIndex = index);
+          // Mobile par click hone ke baad drawer hide ho jaye
+          if (isMobile) Navigator.pop(context);
+        },
+        selected: isSelected,
+        leading: Icon(
+          icon,
+          size: 22,
+          color: isSelected ? Colors.white : Colors.grey[600],
+        ),
+        title: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+
+        // Selected background color blue
+        selectedTileColor: const Color(0xFF2196F3),
+        selectedColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 
@@ -91,7 +148,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          const Icon(Icons.flash_on, color: Color(0xFF6366F1), size: 30),
+          const Icon(Icons.flash_on, color: Color(0xFF2196F3), size: 28),
           const Gap(10),
           Text(
             "Shortie",
@@ -105,56 +162,68 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[400],
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(int index, IconData icon, String label) {
-    bool isSelected = _selectedIndex == index;
-    return ListTile(
-      selected: isSelected,
-      onTap: () => setState(() => _selectedIndex = index),
-      leading: Icon(icon, color: isSelected ? Colors.white : Colors.grey[600]),
-      title: Text(
-        label,
+      padding: const EdgeInsets.only(left: 15, top: 20, bottom: 8),
+      child: Text(
+        title,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.grey[700],
-          fontSize: 14,
+          fontSize: 10,
+          color: Colors.grey[400],
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
         ),
       ),
-      tileColor: Colors.transparent,
-      selectedTileColor: const Color(0xFF6366F1), // Purple color match
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     );
   }
 
   Widget _buildTopHeader() {
     return Container(
       height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
       color: Colors.white,
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Row(
         children: [
-          Text("Demo Admin", style: TextStyle(fontWeight: FontWeight.bold)),
-          Gap(10),
-          CircleAvatar(
-            backgroundColor: Color(0xFFF1F2F7),
-            child: Icon(Icons.person),
+          // Drawer icon click pe hide/show logic yahan add ho sakti hai (agar desktop toggle chahiye)
+          const Icon(Icons.menu_open, color: Colors.grey),
+          const Spacer(),
+          Text(
+            "Demo Admin",
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          const Gap(10),
+          const CircleAvatar(
+            backgroundColor: Color(0xFFE3F2FD),
+            child: Icon(Icons.person, color: Color(0xFF2196F3)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBodyContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Dashboard Overview",
+            style: GoogleFonts.poppins(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Gap(20),
+          // Demo content for verification of layout
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Center(child: Text("Welcome to Shortie Admin Panel")),
           ),
         ],
       ),
