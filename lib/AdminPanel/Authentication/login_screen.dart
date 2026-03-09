@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,11 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: const Color(0xFF6366F1), // Light grey background
                 ),
                 child: Center(
-                  child: Image.network(
-                    'https://img.freepik.com/free-vector/tablet-login-concept-illustration_114360-7863.jpg',
-                    fit: BoxFit.contain,
-                    width: width * 0.4,
-                  ),
+                  child: Image(image: AssetImage(AppImages.liveimg)),
                 ),
               ),
             ),
