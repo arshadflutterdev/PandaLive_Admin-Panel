@@ -96,6 +96,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
               _navItem(0, Icons.grid_view_rounded, "Dashboard", isMobile),
               _sectionTitle("USER MANAGEMENT"),
               _navItem(1, Icons.people_outline_rounded, "User", isMobile),
+              _navItem(1, Icons.verified, "Verification Request", isMobile),
               _sectionTitle("FINANCE"),
               _navItem(6, Icons.monetization_on_outlined, "Currency", isMobile),
               _navItem(
@@ -153,7 +154,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Image(image: AssetImage(AppImages.settings), height: 20),
+          Image(image: AssetImage(AppImages.panda), height: 40),
           const Gap(10),
           Text(
             "PandaLive",
