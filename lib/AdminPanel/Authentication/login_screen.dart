@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       bottom: 28,
                       right: 100,
                       child: Image.asset(
-                        "assets/images/Recursos_Gráficos_Premium-removebg-preview.png", // AppImages.bgrm use karein
+                        "assets/images/bggg.png", // AppImages.bgrm use karein
                         width: width * 0.3,
                         fit: BoxFit.contain,
                       ),
