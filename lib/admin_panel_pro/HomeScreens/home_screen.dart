@@ -148,7 +148,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
 
               _sectionTitle("REPORTS & REQUESTS"),
               _navItem(9, Icons.help, "Support Request", isMobile),
-              _navItem(10, Icons.report, "Report", isMobile),
+              _navItem(10, Icons.report, "Live Video", isMobile),
 
               _sectionTitle("GENERAL"),
               _navItem(11, Icons.settings, "Settings", isMobile),

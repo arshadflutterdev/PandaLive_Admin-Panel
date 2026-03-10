@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({super.key});
+class LiveStreamers extends StatefulWidget {
+  const LiveStreamers({super.key});
 
   @override
-  State<ReportsScreen> createState() => _ReportsScreenState();
+  State<LiveStreamers> createState() => _LiveStreamersState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> {
+class _LiveStreamersState extends State<LiveStreamers> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();
