@@ -10,10 +10,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   // Controllers for text fields
   final TextEditingController nameController = TextEditingController(
-    text: "Arshad Lashari",
+    text: "Al Zahrani",
   );
   final TextEditingController emailController = TextEditingController(
-    text: "arshad@admin.com",
+    text: "alzahrani.com",
   );
 
   @override
