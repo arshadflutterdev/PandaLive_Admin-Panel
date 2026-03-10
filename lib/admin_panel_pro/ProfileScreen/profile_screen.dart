@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_images.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -70,11 +71,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
-                                child: Image.network(
-                                  "https://via.placeholder.com/150", // Arshad Lashari placeholder image
+                                child: Image(
+                                  image: AssetImage(AppImages.user),
                                   height: 150,
-                                  width: 150,
-                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
@@ -96,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          "Arshad Lashari",
+                          "Al Zahrani",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
