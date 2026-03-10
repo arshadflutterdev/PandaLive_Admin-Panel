@@ -1,66 +1,175 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-class TeamSupport extends StatefulWidget {
-  const TeamSupport({super.key});
+// --- MODEL CLASS ---
+class SupportRequestModel {
+  final String id;
+  final String description;
+  final String contactNumber;
+  final String status;
+  final List<String> imageUrls;
+  final DateTime createdAt;
+  final String userId;
 
-  @override
-  State<TeamSupport> createState() => _TeamSupportState();
+  SupportRequestModel({
+    required this.id,
+    required this.description,
+    required this.contactNumber,
+    required this.status,
+    required this.imageUrls,
+    required this.createdAt,
+    required this.userId,
+  });
+
+  factory SupportRequestModel.fromJson(
+    Map<String, dynamic> json,
+    String docId,
+    String uId,
+  ) {
+    return SupportRequestModel(
+      id: docId,
+      description: json['description'] ?? '',
+      contactNumber: json['contactNumber'] ?? '',
+      status: json['status'] ?? 'pending',
+      imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      createdAt: (json['createdAt'] as Timestamp).toDate(),
+      userId: uId,
+    );
+  }
 }
 
-class _TeamSupportState extends State<TeamSupport>
-    with TickerProviderStateMixin {
-  late TabController tabController;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+// --- MAIN SCREEN ---
+class SupportAdminPage extends StatefulWidget {
   @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: 2, vsync: this);
+  _SupportAdminPageState createState() => _SupportAdminPageState();
+}
+
+class _SupportAdminPageState extends State<SupportAdminPage> {
+  // 1. Mark as Solved Logic
+  void _markAsSolved(SupportRequestModel request) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('userProfile')
+          .doc(request.userId)
+          .collection('help_requests')
+          .doc(request.id)
+          .update({'status': 'solved'});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Request marked as solved!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF1F4F9),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildCustomTabBar(),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 10,
+  // 2. Delete Logic
+  void _deleteRequest(SupportRequestModel request) async {
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Confirm Delete"),
+        content: Text("Kya aap waqai is request ko delete karna chahte hain?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text("No"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text("Delete", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await FirebaseFirestore.instance
+          .collection('userProfile')
+          .doc(request.userId)
+          .collection('help_requests')
+          .doc(request.id)
+          .delete();
+    }
+  }
+
+  // 3. Info Dialog with Gallery (6 Images support)
+  void _showInfoDialog(SupportRequestModel request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Support Request Details"),
+        content: Container(
+          width: 500,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _label("Description"),
+                Text(request.description),
+                Divider(),
+                _label("Contact Number"),
+                Text(request.contactNumber),
+                Divider(),
+                _label("Images (${request.imageUrls.length}/6)"),
+                SizedBox(height: 10),
+                if (request.imageUrls.isEmpty)
+                  Text("No images attached.")
+                else
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildTableToolbar(),
-                    _buildTableHeader(),
-                    Expanded(
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          _buildSupportList(
-                            "pending",
-                          ), // Lowercase match with Firebase
-                          _buildSupportList("solved"),
-                        ],
+                    itemCount: request.imageUrls.length,
+                    itemBuilder: (ctx, index) => GestureDetector(
+                      onTap: () => _viewFullImage(request.imageUrls[index]),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          request.imageUrls[index],
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Close"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _viewFullImage(String url) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            InteractiveViewer(child: Center(child: Image.network(url))),
+            IconButton(
+              icon: Icon(Icons.close, color: Colors.white, size: 30),
+              onPressed: () => Navigator.pop(ctx),
             ),
           ],
         ),
@@ -68,206 +177,102 @@ class _TeamSupportState extends State<TeamSupport>
     );
   }
 
-  Widget _buildSupportList(String statusFilter) {
-    return StreamBuilder<QuerySnapshot>(
-      // FIXED: Sub-collection ko access karne ke liye collectionGroup use kiya hai
-      stream: _firestore
-          .collectionGroup("help_requests")
-          .where("status", isEqualTo: statusFilter)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          // Agar indexing ka masla ho to yahan error nazar ayega
-          return Center(child: Text("Firebase Error: ${snapshot.error}"));
-        }
+  Widget _label(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Text(
+      text,
+      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+    ),
+  );
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xff7C78FF)),
-          );
-        }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Support Requests Management")),
+      body: StreamBuilder<QuerySnapshot>(
+        // Using CollectionGroup to get all help_requests from all users
+        stream: FirebaseFirestore.instance
+            .collectionGroup('help_requests')
+            .where('status', isEqualTo: 'pending')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError)
+            return Center(child: Text("Error: ${snapshot.error}"));
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return Center(child: CircularProgressIndicator());
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.search_off, size: 50, color: Colors.grey),
-                const SizedBox(height: 10),
-                Text("No '$statusFilter' requests found in sub-collections."),
-              ],
+          var docs = snapshot.data!.docs;
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text("Date")),
+                  DataColumn(label: Text("Contact")),
+                  DataColumn(label: Text("Description")),
+                  DataColumn(label: Text("Actions")),
+                ],
+                rows: docs.map((doc) {
+                  // Getting parent UserID from the document path
+                  String uId = doc.reference.parent.parent!.id;
+                  var request = SupportRequestModel.fromJson(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                    uId,
+                  );
+
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        Text(
+                          DateFormat(
+                            'dd MMM, hh:mm a',
+                          ).format(request.createdAt),
+                        ),
+                      ),
+                      DataCell(Text(request.contactNumber)),
+                      DataCell(
+                        Text(
+                          request.description,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      DataCell(
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.info_outline,
+                                color: Colors.blue,
+                              ),
+                              onPressed: () => _showInfoDialog(request),
+                              tooltip: "View Details",
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              ),
+                              onPressed: () => _markAsSolved(request),
+                              tooltip: "Mark Solved",
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteRequest(request),
+                              tooltip: "Delete",
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           );
-        }
-
-        var docs = snapshot.data!.docs;
-
-        return ListView.separated(
-          itemCount: docs.length,
-          separatorBuilder: (context, index) =>
-              Divider(height: 1, color: Colors.grey.shade100),
-          itemBuilder: (context, index) {
-            var data = docs[index].data() as Map<String, dynamic>;
-
-            // Database mapping as per screenshot
-            String userName = data['userName'] ?? "No Name";
-            String topic = data['topic'] ?? "No Topic";
-            String detail = data['detail'] ?? "No Detail";
-            String shortId = data['shortId']?.toString() ?? "N/A";
-
-            String dateStr = "N/A";
-            String timeStr = "N/A";
-            if (data['createdAt'] != null && data['createdAt'] is Timestamp) {
-              DateTime dt = (data['createdAt'] as Timestamp).toDate();
-              dateStr = DateFormat('dd/MM/yyyy').format(dt);
-              timeStr = DateFormat('hh:mm a').format(dt);
-            }
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              child: Row(
-                children: [
-                  _cell("${index + 1}", 1),
-                  _cell(shortId, 2),
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  _cell(dateStr, 2),
-                  _cell(timeStr, 2),
-                  // INFO (Details popup)
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.info_outline,
-                        color: Colors.grey,
-                        size: 18,
-                      ),
-                      onPressed: () => _showDetailPopup(topic, detail),
-                    ),
-                  ),
-                  // ACTION (Status update)
-                  Expanded(
-                    flex: 2,
-                    child: statusFilter == "pending"
-                        ? IconButton(
-                            icon: const Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                              size: 22,
-                            ),
-                            onPressed: () =>
-                                _markAsSolved(docs[index].reference),
-                          )
-                        : const Icon(
-                            Icons.done_all,
-                            color: Colors.blue,
-                            size: 20,
-                          ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // --- UI Layout Helpers ---
-  Widget _buildTableHeader() {
-    return Container(
-      color: const Color(0xffF8F9FB),
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-      child: Row(
-        children: [
-          _cell("NO", 1, isHeader: true),
-          _cell("UNIQUE ID", 2, isHeader: true),
-          _cell("NAME", 3, isHeader: true),
-          _cell("DATE", 2, isHeader: true),
-          _cell("TIME", 2, isHeader: true),
-          _cell("INFO", 1, isHeader: true),
-          _cell("ACTION", 2, isHeader: true),
-        ],
+        },
       ),
     );
-  }
-
-  static Widget _cell(String text, int flex, {bool isHeader = false}) {
-    return Expanded(
-      flex: flex,
-      child: Text(
-        text,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          color: isHeader ? Colors.grey.shade600 : Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCustomTabBar() {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: TabBar(
-        controller: tabController,
-        indicator: BoxDecoration(
-          color: const Color(0xff7C78FF),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey,
-        dividerColor: Colors.transparent,
-        tabs: const [
-          Tab(text: "Pending"),
-          Tab(text: "Solved"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableToolbar() {
-    return const Padding(
-      padding: EdgeInsets.all(20),
-      child: Text(
-        "Support Request Table",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  void _showDetailPopup(String topic, String detail) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(topic, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(detail),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _markAsSolved(DocumentReference ref) {
-    ref.update({"status": "solved"});
   }
 }

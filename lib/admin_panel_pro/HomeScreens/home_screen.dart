@@ -37,7 +37,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     WithdrawalScreens(), // 6
     CoinsPlans(), // 7
     OrderHistory(), // 8
-    TeamSupport(), // 9
+    SupportAdminPage(), // 9
     ReportsScreen(), // 10
     SettingsScreen(), // 11
     ProfileScreen(), // 12
