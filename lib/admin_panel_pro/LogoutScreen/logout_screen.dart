@@ -77,11 +77,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
                   // CANCEL BUTTON: Is pe click karne se kuch nahi hoga, sirf wapis jayega
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.pop(
-                          context,
-                        ); // Sirf screen close hogi, kuch bhi change nahi hoga
-                      },
+                      onPressed: () {},
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         side: BorderSide(color: Colors.grey.shade300),
