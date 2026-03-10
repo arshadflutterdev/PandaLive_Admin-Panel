@@ -26,20 +26,22 @@ class HomeScreenPro extends StatefulWidget {
 class _HomeScreenProState extends State<HomeScreenPro> {
   int _selectedIndex = 0;
   bool _isSidebarVisible = true; // Laptop toggle state
+  // --- IS LIST KA SEQUENCE CHECK KAREIN ---
   List<Widget> appscreens = [
-    DashboardScreen(),
-    AppUsersScreen(),
-    VerifyusersPro(),
-    GiftScreen(),
-    CurrencyScreens(),
-    WithdrawalScreens(),
-    CoinsPlans(),
-    OrderHistory(),
-    TeamSupport(),
-    ReportsScreen(),
-    SettingsScreen(),
-    ProfileScreen(),
-    LogoutScreen(),
+    DashboardScreen(), // 0
+    AppUsersScreen(), // 1
+    VerifyusersPro(), // 2
+    GiftScreen(), // 3
+    Placeholder(), // 4 <-- Yahan Reactions ki screen rakhein (Abhi ke liye Placeholder)
+    CurrencyScreens(), // 5
+    WithdrawalScreens(), // 6
+    CoinsPlans(), // 7
+    OrderHistory(), // 8
+    TeamSupport(), // 9
+    ReportsScreen(), // 10
+    SettingsScreen(), // 11
+    ProfileScreen(), // 12
+    LogoutScreen(), // 13
   ];
 
   @override
@@ -107,41 +109,51 @@ class _HomeScreenProState extends State<HomeScreenPro> {
             children: [
               _sectionTitle("DASHBOARD"),
               _navItem(0, Icons.grid_view_rounded, "Dashboard", isMobile),
+
               _sectionTitle("USER MANAGEMENT"),
               _navItem(1, Icons.people_outline_rounded, "User", isMobile),
               _navItem(2, Icons.verified, "Verification Request", isMobile),
-              _sectionTitle("Content Management"),
+
+              _sectionTitle("CONTENT MANAGEMENT"),
               _navItem(3, Icons.wallet_giftcard_sharp, "Gifts", isMobile),
-              _navItem(4, Icons.add_reaction, "Reactions", isMobile),
+              _navItem(
+                4,
+                Icons.add_reaction,
+                "Reactions",
+                isMobile,
+              ), // Alag Index (4)
 
               _sectionTitle("FINANCE"),
-              _navItem(6, Icons.monetization_on_outlined, "Currency", isMobile),
               _navItem(
-                7,
+                5,
+                Icons.monetization_on_outlined,
+                "Currency",
+                isMobile,
+              ), // Alag Index (5)
+              _navItem(
+                6,
                 Icons.account_balance_wallet_outlined,
                 "Withdraw",
                 isMobile,
-              ),
-              _sectionTitle("Content Management"),
+              ), // Alag Index (6)
+
+              _sectionTitle("PACKAGES"),
               _navItem(
-                8,
+                7,
                 Icons.currency_exchange_rounded,
                 "Coins Plans",
                 isMobile,
               ),
-              _navItem(
-                9,
-                Icons.account_balance_wallet_outlined,
-                "Order-History",
-                isMobile,
-              ),
-              _sectionTitle("Reports & Requests"),
-              _navItem(10, Icons.help, "Support Request", isMobile),
-              _navItem(11, Icons.report, "Report", isMobile),
-              _sectionTitle("General"),
-              _navItem(12, Icons.settings, "Settings", isMobile),
-              _navItem(13, Icons.person_2_outlined, "Profile", isMobile),
-              _navItem(14, Icons.logout, "Logout", isMobile),
+              _navItem(8, Icons.history, "Order-History", isMobile),
+
+              _sectionTitle("REPORTS & REQUESTS"),
+              _navItem(9, Icons.help, "Support Request", isMobile),
+              _navItem(10, Icons.report, "Report", isMobile),
+
+              _sectionTitle("GENERAL"),
+              _navItem(11, Icons.settings, "Settings", isMobile),
+              _navItem(12, Icons.person_2_outlined, "Profile", isMobile),
+              _navItem(13, Icons.logout, "Logout", isMobile),
             ],
           ),
         ),
