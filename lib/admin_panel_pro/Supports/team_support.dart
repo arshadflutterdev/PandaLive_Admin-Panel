@@ -51,7 +51,9 @@ class _TeamSupportState extends State<TeamSupport>
                       child: TabBarView(
                         controller: tabController,
                         children: [
-                          _buildSupportList("pending"),
+                          _buildSupportList(
+                            "pending",
+                          ), // Lowercase match with Firebase
                           _buildSupportList("solved"),
                         ],
                       ),
@@ -68,17 +70,37 @@ class _TeamSupportState extends State<TeamSupport>
 
   Widget _buildSupportList(String statusFilter) {
     return StreamBuilder<QuerySnapshot>(
+      // FIXED: Sub-collection ko access karne ke liye collectionGroup use kiya hai
       stream: _firestore
-          .collection("help_requests")
+          .collectionGroup("help_requests")
           .where("status", isEqualTo: statusFilter)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
-          return const Center(child: CircularProgressIndicator());
-        var docs = snapshot.data!.docs;
+        if (snapshot.hasError) {
+          // Agar indexing ka masla ho to yahan error nazar ayega
+          return Center(child: Text("Firebase Error: ${snapshot.error}"));
+        }
 
-        if (docs.isEmpty)
-          return Center(child: Text("No $statusFilter requests found."));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xff7C78FF)),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.search_off, size: 50, color: Colors.grey),
+                const SizedBox(height: 10),
+                Text("No '$statusFilter' requests found in sub-collections."),
+              ],
+            ),
+          );
+        }
+
+        var docs = snapshot.data!.docs;
 
         return ListView.separated(
           itemCount: docs.length,
@@ -86,61 +108,69 @@ class _TeamSupportState extends State<TeamSupport>
               Divider(height: 1, color: Colors.grey.shade100),
           itemBuilder: (context, index) {
             var data = docs[index].data() as Map<String, dynamic>;
-            DateTime dateTime = (data['createdAt'] as Timestamp).toDate();
+
+            // Database mapping as per screenshot
+            String userName = data['userName'] ?? "No Name";
+            String topic = data['topic'] ?? "No Topic";
+            String detail = data['detail'] ?? "No Detail";
+            String shortId = data['shortId']?.toString() ?? "N/A";
+
+            String dateStr = "N/A";
+            String timeStr = "N/A";
+            if (data['createdAt'] != null && data['createdAt'] is Timestamp) {
+              DateTime dt = (data['createdAt'] as Timestamp).toDate();
+              dateStr = DateFormat('dd/MM/yyyy').format(dt);
+              timeStr = DateFormat('hh:mm a').format(dt);
+            }
 
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               child: Row(
                 children: [
                   _cell("${index + 1}", 1),
-                  // NAME & SHORT ID
+                  _cell(shortId, 2),
                   Expanded(
                     flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          data['userName'] ?? "User",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
-                        Text(
-                          "ID: ${data['shortId'] ?? 'N/A'}",
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      userName,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  _cell(data['topic'] ?? "General", 2),
-                  _cell(
-                    data['detail'] ?? "No details provided",
-                    3,
-                  ), // Detail column
-                  _cell(DateFormat('dd/MM/yyyy').format(dateTime), 2),
-                  _cell(DateFormat('hh:mm a').format(dateTime), 2),
-                  // ACTIONS
+                  _cell(dateStr, 2),
+                  _cell(timeStr, 2),
+                  // INFO (Details popup)
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.info_outline,
+                        color: Colors.grey,
+                        size: 18,
+                      ),
+                      onPressed: () => _showDetailPopup(topic, detail),
+                    ),
+                  ),
+                  // ACTION (Status update)
                   Expanded(
                     flex: 2,
-                    child: Row(
-                      children: [
-                        _actionButton(
-                          Icons.check_circle_outline,
-                          Colors.green,
-                          () => _markAsSolved(docs[index].id),
-                        ),
-                        const SizedBox(width: 8),
-                        _actionButton(
-                          Icons.delete_outline,
-                          Colors.red,
-                          () => _deleteRequest(docs[index].id),
-                        ),
-                      ],
-                    ),
+                    child: statusFilter == "pending"
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 22,
+                            ),
+                            onPressed: () =>
+                                _markAsSolved(docs[index].reference),
+                          )
+                        : const Icon(
+                            Icons.done_all,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
                   ),
                 ],
               ),
@@ -151,20 +181,7 @@ class _TeamSupportState extends State<TeamSupport>
     );
   }
 
-  Widget _actionButton(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Icon(icon, color: color, size: 18),
-      ),
-    );
-  }
-
+  // --- UI Layout Helpers ---
   Widget _buildTableHeader() {
     return Container(
       color: const Color(0xffF8F9FB),
@@ -172,11 +189,11 @@ class _TeamSupportState extends State<TeamSupport>
       child: Row(
         children: [
           _cell("NO", 1, isHeader: true),
-          _cell("USER NAME", 3, isHeader: true),
-          _cell("TOPIC", 2, isHeader: true),
-          _cell("DETAIL", 3, isHeader: true),
+          _cell("UNIQUE ID", 2, isHeader: true),
+          _cell("NAME", 3, isHeader: true),
           _cell("DATE", 2, isHeader: true),
           _cell("TIME", 2, isHeader: true),
+          _cell("INFO", 1, isHeader: true),
           _cell("ACTION", 2, isHeader: true),
         ],
       ),
@@ -188,7 +205,6 @@ class _TeamSupportState extends State<TeamSupport>
       flex: flex,
       child: Text(
         text,
-        maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
@@ -234,11 +250,24 @@ class _TeamSupportState extends State<TeamSupport>
     );
   }
 
-  void _markAsSolved(String id) {
-    _firestore.collection("help_requests").doc(id).update({"status": "solved"});
+  void _showDetailPopup(String topic, String detail) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(topic, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(detail),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
-  void _deleteRequest(String id) {
-    _firestore.collection("help_requests").doc(id).delete();
+  void _markAsSolved(DocumentReference ref) {
+    ref.update({"status": "solved"});
   }
 }
