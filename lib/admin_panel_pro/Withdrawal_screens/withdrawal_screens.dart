@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter/services.dart'; // Copy feature ke liye
 
 class WithdrawalScreens extends StatefulWidget {
   const WithdrawalScreens({super.key});
@@ -20,180 +19,44 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     tabController = TabController(length: 3, vsync: this);
   }
 
-  // --- Methods Definitions ---
-
-  Future<void> _handleApprove(String uid, String userName) async {
-    try {
-      await _firestore.collection("userProfile").doc(uid).update({
-        "withdrawlstatus": "Approved", //
-      });
-
-      await _firestore
-          .collection("userProfile")
-          .doc(uid)
-          .collection("notifications")
-          .add({
-            "title": "Request Approved! 🎉",
-            "body":
-                "Dear $userName, your withdrawal is approved. You will receive payment within 3 working days.",
-            "time": FieldValue.serverTimestamp(),
-          });
-
-      Get.snackbar("Approved", "User $userName notified successfully.");
-    } catch (e) {
-      Get.snackbar("Error", "Failed to approve: $e");
-    }
-  }
-
-  void _handleReject(String uid, String statusString, String userName) {
-    // Logic to extract amount if stored in string status like "Pending ($50)"
-    int amount = 0;
-    if (statusString.contains("\$")) {
-      amount = int.tryParse(statusString.split("\$")[1].split(")")[0]) ?? 0;
-    }
-
-    Get.defaultDialog(
-      title: "Confirm Reject",
-      middleText: "Are you sure? \$$amount will be returned to $userName.",
-      textConfirm: "Reject & Refund",
-      buttonColor: Colors.red,
-      onConfirm: () async {
-        Get.back();
-        try {
-          await _firestore.runTransaction((transaction) async {
-            DocumentSnapshot snap = await transaction.get(
-              _firestore.collection("userProfile").doc(uid),
-            );
-            transaction.update(_firestore.collection("userProfile").doc(uid), {
-              "withdrawlstatus": "Rejected", //
-              "dollars": (snap['dollars'] ?? 0) + amount,
-            });
-          });
-
-          await _firestore
-              .collection("userProfile")
-              .doc(uid)
-              .collection("notifications")
-              .add({
-                "title": "Withdrawal Rejected",
-                "body":
-                    "Dear $userName, your withdrawal request was rejected. Your balance has been refunded.",
-                "time": FieldValue.serverTimestamp(),
-              });
-        } catch (e) {
-          Get.snackbar("Error", "Transaction failed: $e");
-        }
-      },
-    );
-  }
-
-  // --- UI Parts ---
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF1F4F9),
-      appBar: AppBar(
-        title: const Text(
-          "Panda admin",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const Icon(Icons.menu, color: Colors.grey),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Color(0xffD6E4FF),
-              child: Icon(Icons.person, color: Colors.blue),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildHeaderTabs(),
-          const SizedBox(height: 20),
-          _buildTableContainer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderTabs() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Withdrawal Management",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            height: 45,
-            decoration: BoxDecoration(
-              color: const Color(0xffF8F9FB),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: TabBar(
-              controller: tabController,
-              indicator: BoxDecoration(
-                color: const Color(0xff7C78FF),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.grey,
-              tabs: const [
-                Tab(text: "Pending"),
-                Tab(text: "Accepted"),
-                Tab(text: "Declined"),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableContainer() {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
-          ],
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  const Text(
-                    "Pending Withdraw Request",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const Spacer(),
-                  _buildSearchBox(),
-                ],
-              ),
-            ),
-            _buildTableHeader(),
+            _buildCustomTabBar(),
+            const SizedBox(height: 20),
             Expanded(
-              child: TabBarView(
-                controller: tabController,
-                children: [
-                  _buildDataTable("Pending"),
-                  _buildDataTable("Approved"),
-                  _buildDataTable("Rejected"),
-                ],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildTableToolbar(),
+                    _buildTableHeader(),
+                    Expanded(
+                      child: TabBarView(
+                        controller: tabController,
+                        children: [
+                          _buildFirebaseDataTable("Pending"),
+                          _buildFirebaseDataTable("Approved"),
+                          _buildFirebaseDataTable("Rejected"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -202,186 +65,125 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     );
   }
 
-  Widget _buildTableHeader() {
-    return Container(
-      color: const Color(0xffF8F9FB),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      child: const Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Text(
-              "NO",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              "USERNAME",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "UNIQUE ID",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "COIN",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "DATE",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "ACTION",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDataTable(String filter) {
+  Widget _buildFirebaseDataTable(String statusFilter) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection("userProfile").snapshots(),
+      stream: _firestore
+          .collection("userProfile")
+          .where("withdrawlstatus", isEqualTo: statusFilter)
+          .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
-          return const Center(child: CircularProgressIndicator());
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xff7C78FF)),
+          );
+        }
 
-        var docs = snapshot.data!.docs.where((doc) {
-          var data = doc.data() as Map<String, dynamic>;
-          return data.containsKey('withdrawlstatus') &&
-              data['withdrawlstatus'].toString().contains(filter);
-        }).toList();
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No $statusFilter requests found."));
+        }
 
-        if (docs.isEmpty) return const Center(child: Text("No data found"));
+        var docs = snapshot.data!.docs;
 
         return ListView.separated(
           itemCount: docs.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
+          separatorBuilder: (context, index) =>
+              Divider(height: 1, color: Colors.grey.shade100),
           itemBuilder: (context, index) {
             var data = docs[index].data() as Map<String, dynamic>;
-            String uid = docs[index].id;
-            String status = data['withdrawlstatus'].toString();
+
+            String name = data['name'] ?? "No Name";
+            String binanceId = data['binanceId'] ?? "N/A";
+            var dollars = data['dollars'] ?? 0;
+            String status = data['withdrawlstatus'] ?? "Pending";
 
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               child: Row(
                 children: [
-                  Expanded(flex: 1, child: Text("${index + 1}")),
+                  _cell("${index + 1}", 1),
+                  // 1. USERNAME
                   Expanded(
                     flex: 3,
                     child: Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 14,
-                          child: Icon(Icons.person, size: 16),
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundImage: data['userimage'] != null
+                              ? NetworkImage(data['userimage'])
+                              : null,
+                          backgroundColor: const Color(
+                            0xff7C78FF,
+                          ).withOpacity(0.1),
+                          child: data['userimage'] == null
+                              ? Text(name[0].toUpperCase())
+                              : null,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Text(
-                          data['name'] ?? "User",
-                          style: const TextStyle(fontSize: 13),
+                          name,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
+                  // 2. GATEWAY
+                  const Expanded(
                     flex: 2,
-                    child: Text(
-                      uid.substring(0, 6),
-                      style: const TextStyle(fontSize: 13),
-                    ),
+                    child: Text("Binance", style: TextStyle(fontSize: 13)),
                   ),
+                  // 3. GATEWAY ID (Binance ID)
                   Expanded(
                     flex: 2,
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.monetization_on,
-                          color: Colors.orange,
-                          size: 14,
+                        Expanded(
+                          child: Text(
+                            binanceId,
+                            style: const TextStyle(fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "${data['coins'] ?? 100}",
-                          style: const TextStyle(fontSize: 13),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.copy,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: binanceId));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("ID Copied"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
+                  // 4. DOLLARS
                   Expanded(
                     flex: 2,
                     child: Text(
-                      "9/26/2025",
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      "\$ $dollars",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
                     ),
                   ),
-                  Expanded(
+                  // 5. DATE
+                  const Expanded(
                     flex: 2,
-                    child: filter == "Pending"
-                        ? Row(
-                            children: [
-                              _actionIconButton(
-                                Icons.check,
-                                Colors.green,
-                                () => _handleApprove(uid, data['name']),
-                              ),
-                              const SizedBox(width: 10),
-                              _actionIconButton(
-                                Icons.close,
-                                Colors.red,
-                                () => _handleReject(uid, status, data['name']),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            filter,
-                            style: TextStyle(
-                              color: filter == "Approved"
-                                  ? Colors.green
-                                  : Colors.red,
-                              fontSize: 12,
-                            ),
-                          ),
+                    child: Text("3/10/2026", style: TextStyle(fontSize: 12)),
                   ),
+                  // 6. STATUS BADGE
+                  Expanded(flex: 2, child: _buildStatusBadge(status)),
                 ],
               ),
             );
@@ -391,37 +193,96 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     );
   }
 
-  Widget _actionIconButton(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          border: Border.all(color: color.withOpacity(0.3)),
-          borderRadius: BorderRadius.circular(6),
+  Widget _buildStatusBadge(String status) {
+    Color color = Colors.orange;
+    if (status == "Approved") color = Colors.green;
+    if (status == "Rejected") color = Colors.red;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        status,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
         ),
-        child: Icon(icon, color: color, size: 16),
       ),
     );
   }
 
-  Widget _buildSearchBox() {
+  Widget _buildTableHeader() {
     return Container(
-      width: 200,
-      height: 35,
+      color: const Color(0xffF8F9FB),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      child: Row(
+        children: [
+          _cell("NO", 1, isHeader: true),
+          _cell("USERNAME", 3, isHeader: true),
+          _cell("GATEWAY", 2, isHeader: true),
+          _cell("GATEWAY ID", 2, isHeader: true),
+          _cell("DOLLARS", 2, isHeader: true),
+          _cell("DATE", 2, isHeader: true),
+          _cell("STATUS", 2, isHeader: true),
+        ],
+      ),
+    );
+  }
+
+  static Widget _cell(String text, int flex, {bool isHeader = false}) {
+    return Expanded(
+      flex: flex,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          color: isHeader ? Colors.grey.shade600 : Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomTabBar() {
+    return Container(
+      width: 350,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: const TextField(
-        decoration: InputDecoration(
-          hintText: "Search Here",
-          hintStyle: TextStyle(fontSize: 12),
-          prefixIcon: Icon(Icons.search, size: 16),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.only(bottom: 12),
+      child: TabBar(
+        controller: tabController,
+        indicator: BoxDecoration(
+          color: const Color(0xff7C78FF),
+          borderRadius: BorderRadius.circular(6),
         ),
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.grey,
+        dividerColor: Colors.transparent,
+        indicatorSize: TabBarIndicatorSize.tab,
+
+        tabs: const [
+          Tab(text: "Pending"),
+          Tab(text: "Accepted"),
+          Tab(text: "Declined"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableToolbar() {
+    return const Padding(
+      padding: EdgeInsets.all(20),
+      child: Text(
+        "Pending Withdraw Request",
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
   }
