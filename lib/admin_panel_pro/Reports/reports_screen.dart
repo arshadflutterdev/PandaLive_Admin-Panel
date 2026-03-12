@@ -1,5 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
+import 'package:panda_adminpanel/AdminPanel/Utils/Constants/app_colours.dart';
 
 class LiveStreamers extends StatefulWidget {
   const LiveStreamers({super.key});
@@ -9,200 +15,179 @@ class LiveStreamers extends StatefulWidget {
 }
 
 class _LiveStreamersState extends State<LiveStreamers> {
-  final CollectionReference liveStream = FirebaseFirestore.instance.collection(
-    "LiveStream",
-  );
+  final liveStream = FirebaseFirestore.instance.collection("LiveStream");
+  late DateTime stableThreshold;
+  String? currentUserId;
 
-  // Admin status toggle function
-  // Admin side toggle function
-  Future<void> toggleLiveStatus(String docId, bool currentStatus) async {
-    await liveStream.doc(docId).update({
-      'isLive': !currentStatus,
-      'status': !currentStatus
-          ? "online"
-          : "blocked", // Flag for the app to listen
-    });
+  @override
+  void initState() {
+    super.initState();
+    currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    stableThreshold = DateTime.now().subtract(const Duration(minutes: 1));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
-          ),
-        ],
+    final height = MediaQuery.of(context).size.height;
+
+    final width = MediaQuery.of(context).size.width;
+    bool isArabic = Get.locale?.languageCode == "ar";
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Active Streamers"),
+        centerTitle: true,
+        backgroundColor: AppColours.bg,
       ),
-      child: StreamBuilder<QuerySnapshot>(
-        stream: liveStream.snapshots(),
+      backgroundColor: AppColours.bg,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: liveStream
+            .where("uid", isNotEqualTo: currentUserId)
+            .where("lastHeartbeat", isGreaterThan: stableThreshold)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final docs = snapshot.data?.docs ?? [];
-
-          return Theme(
-            // Table ki styling ko modern banane ke liye theme
-            data: Theme.of(context).copyWith(dividerColor: Colors.grey[200]),
-            child: DataTable(
-              headingRowHeight: 50,
-              dataRowHeight: 70,
-              horizontalMargin: 20,
-              columns: _buildColumns(),
-              rows: List.generate(docs.length, (index) {
+            return Center(
+              child: CircularProgressIndicator(color: Colors.green),
+            );
+          } else if (snapshot.hasError) {
+            return Text("Error in data");
+          } else if (!snapshot.hasData) {
+            return Center(child: Text("There is no data"));
+          } else {
+            final docs = snapshot.data?.docs ?? [];
+            if (docs.isEmpty) {
+              return Center(child: Text("no live".tr));
+            }
+            return GridView.builder(
+              itemCount: docs.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+                crossAxisCount: kIsWeb ? 3 : 2,
+                childAspectRatio: 1.1,
+              ),
+              itemBuilder: (context, index) {
                 final data = docs[index].data() as Map<String, dynamic>;
-                final docId = docs[index].id;
-                bool isLive = data['isLive'] ?? true;
-
-                return DataRow(
-                  cells: [
-                    DataCell(
-                      Text(
-                        '${index + 1}',
-                        style: const TextStyle(color: Colors.grey),
+                if (data.isEmpty) {}
+                return GestureDetector(
+                  onTap: () {
+                    if (data["agoraUid"] == null) {
+                      Get.snackbar(
+                        "",
+                        titleText: Text(isArabic ? "انتظر" : "Wait"),
+                        messageText: Text(
+                          isArabic
+                              ? "المضيف لا يزال متصلا"
+                              : "Host is still connecting",
+                        ),
+                        "",
+                        backgroundColor: Colors.black87,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+                    // Get.toNamed(
+                    //   AppRoutes.watchstream,
+                    //   arguments: {
+                    //     "uid": data["uid"],
+                    //     "channelId": data["channelId"],
+                    //     "hostname": data["hostname"],
+                    //     "hostphoto": data["image"],
+                    //     "agoraUid":
+                    //         data["agoraUid"], // This is the ID we saved in GoLiveScreen
+                    //   },
+                    // );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: data["image"] != null
+                            ? NetworkImage(data["image"])
+                            : Icon(Icons.image, color: Colors.black)
+                                  as ImageProvider,
                       ),
                     ),
-                    DataCell(_buildUserCell(data)),
-                    DataCell(_buildStreamingTypeTag()),
-                    DataCell(_buildStatusSwitch(docId, isLive)),
-                    DataCell(_buildVideoIcon()),
-                    DataCell(_buildActionButtons(docId)),
-                  ],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: AppColours.bg,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text("Live now"),
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Text(
+                                    data["hostname"] ?? "Guest",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              Gap(5),
+
+                              Spacer(),
+                              Icon(Icons.remove_red_eye, color: Colors.black),
+                              Gap(3),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 2,
+                                  ),
+                                  child: Text(
+                                    (data["views"] ?? 0).toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
-              }),
-            ),
-          );
+              },
+            );
+          }
         },
-      ),
-    );
-  }
-
-  // Header Columns
-  List<DataColumn> _buildColumns() {
-    const textStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-      color: Colors.black54,
-      fontSize: 13,
-    );
-    return const [
-      DataColumn(label: Text('NO', style: textStyle)),
-      DataColumn(label: Text('USER', style: textStyle)),
-      DataColumn(label: Text('STREAMING TYPE', style: textStyle)),
-      DataColumn(label: Text('LIVE STATUS', style: textStyle)),
-      DataColumn(label: Text('VIDEO', style: textStyle)),
-      DataColumn(label: Text('ACTION', style: textStyle)),
-    ];
-  }
-
-  // User Profile Cell
-  Widget _buildUserCell(Map<String, dynamic> data) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: Colors.grey[200],
-          backgroundImage: data['image'] != null
-              ? NetworkImage(data['image'])
-              : null,
-          child: data['image'] == null
-              ? const Icon(Icons.person, color: Colors.grey)
-              : null,
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              data['hostname'] ?? 'N/A',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            Text(
-              data['uid']?.toString().substring(0, 8) ?? 'ID: ---',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // Normal Live Tag
-  Widget _buildStreamingTypeTag() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8EAF6), // Light blue tint
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Text(
-        "Normal Live",
-        style: TextStyle(
-          color: Color(0xFF3F51B5),
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  // Custom Styled Switch
-  Widget _buildStatusSwitch(String docId, bool isLive) {
-    return Transform.scale(
-      scale: 0.8,
-      child: Switch(
-        value: isLive,
-        activeColor: Colors.blue,
-        onChanged: (value) => toggleLiveStatus(docId, isLive),
-      ),
-    );
-  }
-
-  // Video Camera Icon
-  Widget _buildVideoIcon() {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.indigoAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: const Icon(Icons.videocam, color: Colors.indigoAccent, size: 20),
-    );
-  }
-
-  // Action Buttons (Edit/Delete)
-  Widget _buildActionButtons(String docId) {
-    return Row(
-      children: [
-        _iconButton(Icons.edit_outlined, Colors.grey, () {}),
-        const SizedBox(width: 8),
-        _iconButton(Icons.delete_outline, Colors.grey, () {
-          // Delete logic
-          liveStream.doc(docId).delete();
-        }),
-      ],
-    );
-  }
-
-  Widget _iconButton(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(icon, size: 18, color: color),
       ),
     );
   }
