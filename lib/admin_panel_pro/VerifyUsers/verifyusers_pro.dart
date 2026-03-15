@@ -77,15 +77,7 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
-      appBar: AppBar(
-        title: Text(
-          "Verification Requests",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        foregroundColor: Colors.black,
-      ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collectionGroup('verification_requests')

@@ -253,6 +253,7 @@
 //                         _buildCopyableID(data['shortId']?.toString() ?? "---"),
 //                       ),
 //                       DataCell(Text(data['gender'] ?? "N/A")),
+
 //                       DataCell(Text(data['country'] ?? "Global")),
 //                       DataCell(
 //                         Switch(
@@ -577,18 +578,16 @@ class _AppUsersScreenState extends State<AppUsersScreen>
         var filteredDocs = allDocs.where((doc) {
           var data = doc.data() as Map<String, dynamic>;
           String name = (data['name'] ?? "").toString().toLowerCase();
-          String sid = (data['shortId'] ?? "").toString();
+          String uid = (data['userId'] ?? "").toString().toLowerCase();
 
           bool matchesSearch =
-              name.contains(searchText) || sid.contains(searchText);
+              name.contains(searchText) || uid.contains(searchText);
           if (!matchesSearch) return false;
 
-          // SAFE DATA CHECKING TO PREVENT TYPE ERROR
           if (type == "blocked")
             return data['blockStatus'].toString() == "blocked";
 
           if (type == "verified") {
-            // Check if it's strictly the boolean true
             return data['isVerified'] == true;
           }
 
@@ -622,21 +621,27 @@ class _AppUsersScreenState extends State<AppUsersScreen>
             borderRadius: BorderRadius.circular(15),
           ),
           child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 8,
+            ),
             leading: _buildUserInfo(
               data['userimage'],
               data['name'],
               data['userId'],
               data['isVerified'],
             ),
-            title: Text(
-              data['shortId']?.toString() ?? "---",
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
+            title:
+                const SizedBox.shrink(), // Removed text here to prevent clashing
             children: [
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: Column(
                   children: [
+                    _mobileInfoRow(
+                      "User ID",
+                      data['userId']?.toString() ?? "N/A",
+                    ),
                     _mobileInfoRow("Location", data['country'] ?? "Global"),
                     _mobileInfoRow("Gender", data['gender'] ?? "N/A"),
                     _mobileInfoRow(
@@ -662,6 +667,9 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                         backgroundColor: const Color(0xFF6C63FF),
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 45),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       onPressed: () => Get.to(
                         () => UserPrewiew(userData: data, docId: doc.id),
@@ -681,12 +689,19 @@ class _AppUsersScreenState extends State<AppUsersScreen>
 
   Widget _mobileInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -728,7 +743,7 @@ class _AppUsersScreenState extends State<AppUsersScreen>
                     ),
                   ),
                   DataCell(
-                    _buildCopyableID(data['shortId']?.toString() ?? "---"),
+                    _buildCopyableID(data['userId']?.toString() ?? "---"),
                   ),
                   DataCell(Text(data['gender'] ?? "N/A")),
                   DataCell(Text(data['country'] ?? "Global")),
@@ -770,9 +785,9 @@ class _AppUsersScreenState extends State<AppUsersScreen>
       const DataColumn(label: Text('UNIQUE ID', style: style)),
       const DataColumn(label: Text('GENDER', style: style)),
       const DataColumn(label: Text('LOCATION', style: style)),
-      const DataColumn(label: Text('Block Status', style: style)),
+      const DataColumn(label: Text('BLOCK STATUS', style: style)),
       const DataColumn(label: Text('JOINED', style: style)),
-      const DataColumn(label: Text('Preview', style: style)),
+      const DataColumn(label: Text('PREVIEW', style: style)),
     ];
   }
 
@@ -782,7 +797,6 @@ class _AppUsersScreenState extends State<AppUsersScreen>
     String? userId,
     dynamic isVerified,
   ) {
-    // Safety check for isVerified icon
     bool verifiedStatus = isVerified == true;
 
     return Row(
@@ -836,12 +850,20 @@ class _AppUsersScreenState extends State<AppUsersScreen>
 
   Widget _buildCopyableID(String id) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFF4F7FE),
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Text(id, style: const TextStyle(fontSize: 12)),
+      child: Text(
+        id,
+        style: const TextStyle(
+          fontSize: 11,
+          color: Color(0xFF2B3674),
+          fontWeight: FontWeight.w500,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
