@@ -371,8 +371,6 @@
 //   }
 // }
 
-// ... (imports remain exactly the same)
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -404,6 +402,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           var docs = snapshot.data!.docs;
 
+          // Data Aggregation
           int totalUsers = docs.length;
           int verifiedUsers = docs
               .where((d) => (d.data() as Map)['isVerified'] == true)
@@ -417,7 +416,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              // Determine if we are on mobile/small screen
               bool isMobile = constraints.maxWidth < 800;
 
               return SingleChildScrollView(
@@ -427,15 +425,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     _buildHeader(),
                     const Gap(30),
+
+                    // Stats Grid logic
                     _buildStatsGrid(
                       totalUsers,
                       verifiedUsers,
                       activeUsers,
                       blockedUsers,
+                      isMobile,
                     ),
+
                     const Gap(30),
 
-                    // Conditional Layout for Charts
+                    // Charts Layout logic
                     if (isMobile)
                       Column(
                         children: [
@@ -489,7 +491,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Monthly Data Logic (Same)
+  // Monthly Data Logic
   List<FlSpot> _getGraphData(List<QueryDocumentSnapshot> docs) {
     Map<int, int> monthlyCount = {for (var i = 1; i <= 12; i++) i: 0};
     for (var doc in docs) {
@@ -504,41 +506,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .toList();
   }
 
-  // --- Reusable Navigation Grid ---
-  Widget _buildStatsGrid(int total, int verified, int active, int blocked) {
+  // --- Updated Navigation Grid ---
+  Widget _buildStatsGrid(
+    int total,
+    int verified,
+    int active,
+    int blocked,
+    bool isMobile,
+  ) {
+    final List<Map<String, dynamic>> stats = [
+      {
+        "label": "Total Users",
+        "value": total.toString(),
+        "icon": Icons.people,
+        "color": Colors.indigo,
+        "arg": 0,
+      },
+      {
+        "label": "Verified",
+        "value": verified.toString(),
+        "icon": Icons.verified,
+        "color": Colors.blue,
+        "arg": 1,
+      },
+      {
+        "label": "Blocked",
+        "value": blocked.toString(),
+        "icon": Icons.block,
+        "color": Colors.red,
+        "arg": 2,
+      },
+      {
+        "label": "Active",
+        "value": active.toString(),
+        "icon": Icons.bolt,
+        "color": Colors.green,
+        "arg": 0,
+      },
+    ];
+
+    if (isMobile) {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 90,
+        ),
+        itemCount: stats.length,
+        itemBuilder: (context, index) {
+          final item = stats[index];
+          return _statTile(
+            item["label"],
+            item["value"],
+            item["icon"],
+            item["color"],
+            () => Get.to(() => const AppUsersScreen(), arguments: item["arg"]),
+            isMobile,
+          );
+        },
+      );
+    }
+
     return Wrap(
       spacing: 20,
       runSpacing: 20,
-      children: [
-        _statTile(
-          "Total Users",
-          total.toString(),
-          Icons.people,
-          Colors.indigo,
-          () => Get.to(() => const AppUsersScreen(), arguments: 0),
-        ),
-        _statTile(
-          "Verified",
-          verified.toString(),
-          Icons.verified,
-          Colors.blue,
-          () => Get.to(() => const AppUsersScreen(), arguments: 1),
-        ),
-        _statTile(
-          "Blocked",
-          blocked.toString(),
-          Icons.block,
-          Colors.red,
-          () => Get.to(() => const AppUsersScreen(), arguments: 2),
-        ),
-        _statTile(
-          "Active",
-          active.toString(),
-          Icons.bolt,
-          Colors.green,
-          () => Get.to(() => const AppUsersScreen(), arguments: 0),
-        ),
-      ],
+      children: stats
+          .map(
+            (item) => _statTile(
+              item["label"],
+              item["value"],
+              item["icon"],
+              item["color"],
+              () =>
+                  Get.to(() => const AppUsersScreen(), arguments: item["arg"]),
+              false,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -548,72 +595,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
     IconData icon,
     Color color,
     VoidCallback onTap,
+    bool isMobile,
   ) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Make tiles stretch on very small screens if needed
-        double cardWidth = MediaQuery.of(context).size.width < 600
-            ? (MediaQuery.of(context).size.width - 50) /
-                  2 // 2 per row
-            : 260;
-
-        return InkWell(
-          onTap: onTap,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: isMobile ? null : 260,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: cardWidth,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: color.withOpacity(0.1),
-                  radius: 18,
-                  child: Icon(icon, color: color, size: 18),
-                ),
-                const Gap(12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: Colors.grey,
-                          fontSize: 11,
-                        ),
-                      ),
-                      Text(
-                        value,
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF2B3674),
-                        ),
-                      ),
-                    ],
+          ],
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.1),
+              radius: 18,
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const Gap(12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(color: Colors.grey, fontSize: 11),
                   ),
-                ),
-              ],
+                  Text(
+                    value,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2B3674),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
-  // --- Charts Implementation (Same as your original code) ---
+  // --- Charts Implementation ---
   Widget _buildLineChart(List<FlSpot> spots) {
     return LineChart(
       LineChartData(
@@ -689,46 +726,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   value: active.toDouble(),
                   color: Colors.green,
                   title: '$active',
-                  radius: 20,
+                  radius: 25,
+                  titleStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
                 PieChartSectionData(
                   value: blocked.toDouble(),
                   color: Colors.redAccent,
                   title: '$blocked',
-                  radius: 20,
+                  radius: 25,
+                  titleStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
                 PieChartSectionData(
                   value: verified.toDouble(),
                   color: Colors.blue,
                   title: '$verified',
-                  radius: 20,
+                  radius: 25,
+                  titleStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        const Gap(10),
-        _buildLegendRow("Active", Colors.green),
-        _buildLegendRow("Blocked", Colors.redAccent),
-        _buildLegendRow("Verified", Colors.blue),
+        const Gap(20),
+        _buildLegendRow("Active Users", Colors.green),
+        _buildLegendRow("Blocked Users", Colors.redAccent),
+        _buildLegendRow("Verified Users", Colors.blue),
       ],
     );
   }
 
   Widget _buildLegendRow(String text, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: 12,
+            height: 12,
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
-          const Gap(8),
+          const Gap(10),
           Text(
             text,
-            style: GoogleFonts.inter(fontSize: 11, color: Colors.blueGrey),
+            style: GoogleFonts.inter(fontSize: 12, color: Colors.blueGrey),
           ),
         ],
       ),
@@ -738,7 +790,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildChartCard(String title, Widget chart) {
     return Container(
       height: 400,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -750,11 +802,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title,
             style: GoogleFonts.inter(
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: 16,
               color: const Color(0xFF2B3674),
             ),
           ),
-          const Gap(20),
+          const Gap(30),
           Expanded(child: chart),
         ],
       ),
@@ -765,7 +817,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Text(
       "Welcome Admin !",
       style: GoogleFonts.inter(
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: FontWeight.bold,
         color: const Color(0xFF2B3674),
       ),
