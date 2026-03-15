@@ -1,4 +1,6 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 import 'package:panda_adminpanel/AdminPanel/Service/app_language.dart';
@@ -14,7 +16,13 @@ void main() async {
   Locale initialLocale = getSavelang == 'ar'
       ? const Locale('ar', 'AE')
       : const Locale('en', 'US');
-  runApp(MyApp(initialLocale: initialLocale));
+  runApp(
+    DevicePreview(
+      // Enable preview only in debug mode for better performance
+      enabled: !kReleaseMode,
+      builder: (context) => MyApp(initialLocale: initialLocale),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
