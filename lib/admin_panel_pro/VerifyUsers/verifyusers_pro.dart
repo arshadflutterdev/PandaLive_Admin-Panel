@@ -11,7 +11,7 @@ class VerifyUsersPro extends StatefulWidget {
 }
 
 class _VerifyUsersProState extends State<VerifyUsersPro> {
-  // Action: Decline (Request ko delete karne ke liye)
+  // 1. DECLINE: Request permanent delete ho jayegi
   Future<void> _declineRequest(String userId, String requestId) async {
     try {
       await FirebaseFirestore.instance
@@ -20,42 +20,57 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
           .collection('verification_requests')
           .doc(requestId)
           .delete();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Request Declined & Deleted")),
-        );
-      }
+      _showStatus("Request Declined & Removed");
     } catch (e) {
-      print("Error deleting request: $e");
+      _showStatus("Error: $e");
     }
   }
 
-  // Action: Approve (Blue Tick add karne ke liye)
+  // 2. APPROVE: Blue Tick milega aur status 'approved' ho jayega (delete nahi hogi)
   Future<void> _approveRequest(String userId, String requestId) async {
     try {
-      // 1. User profile mein verified status true karein
       await FirebaseFirestore.instance
           .collection('userProfile')
           .doc(userId)
           .update({'isVerified': true});
 
-      // 2. Request ko delete kar dein kyunke kaam ho gaya
       await FirebaseFirestore.instance
           .collection('userProfile')
           .doc(userId)
           .collection('verification_requests')
           .doc(requestId)
-          .delete();
+          .update({'mediaUrls.status': 'approved'});
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User Verified Successfully!")),
-        );
-      }
+      _showStatus("User Verified Successfully!");
     } catch (e) {
-      print("Error approving request: $e");
+      _showStatus("Error: $e");
     }
+  }
+
+  // 3. REMOVE TICK: Blue tick wapis lena aur status pending karna
+  Future<void> _removeBlueTick(String userId, String requestId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('userProfile')
+          .doc(userId)
+          .update({'isVerified': false});
+
+      await FirebaseFirestore.instance
+          .collection('userProfile')
+          .doc(userId)
+          .collection('verification_requests')
+          .doc(requestId)
+          .update({'mediaUrls.status': 'pending'});
+
+      _showStatus("Blue Tick Removed");
+    } catch (e) {
+      _showStatus("Error: $e");
+    }
+  }
+
+  void _showStatus(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -85,20 +100,9 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
           final docs = snapshot.data?.docs ?? [];
           if (docs.isEmpty) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.fact_check_outlined,
-                    size: 80,
-                    color: Colors.grey[300],
-                  ),
-                  const Gap(10),
-                  Text(
-                    "No pending requests found",
-                    style: GoogleFonts.inter(color: Colors.grey),
-                  ),
-                ],
+              child: Text(
+                "No requests found",
+                style: GoogleFonts.inter(color: Colors.grey),
               ),
             );
           }
@@ -108,14 +112,13 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
               int crossAxisCount = constraints.maxWidth > 1200
                   ? 3
                   : (constraints.maxWidth > 800 ? 2 : 1);
-
               return GridView.builder(
                 padding: const EdgeInsets.all(20),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  mainAxisExtent: 220, // Height adjusted to fit buttons
+                  mainAxisExtent: 240,
                 ),
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
@@ -131,14 +134,16 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
                     builder: (context, userSnap) {
                       if (!userSnap.hasData) return const SizedBox();
                       var user = userSnap.data!.data() as Map<String, dynamic>;
-                      bool alreadyVerified = user['isVerified'] ?? false;
+                      bool isVerified = user['isVerified'] ?? false;
+                      String currentStatus =
+                          requestData['mediaUrls']?['status'] ?? "pending";
 
-                      return _buildProfessionalCard(
+                      return _buildRequestCard(
                         user,
-                        requestData,
+                        currentStatus,
                         userId,
                         requestId,
-                        alreadyVerified,
+                        isVerified,
                       );
                     },
                   );
@@ -151,29 +156,24 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
     );
   }
 
-  Widget _buildProfessionalCard(
+  Widget _buildRequestCard(
     Map<String, dynamic> user,
-    Map<String, dynamic> request,
+    String status,
     String uId,
     String rId,
     bool isVerified,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10),
         ],
         border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -190,7 +190,7 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
                       children: [
                         Flexible(
                           child: Text(
-                            user['name'] ?? "Unknown",
+                            user['name'] ?? "User",
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -214,19 +214,19 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
                   ],
                 ),
               ),
-              _statusBadge(request['mediaUrls']?['status'] ?? "pending"),
+              _statusBadge(status),
             ],
           ),
           const Gap(15),
-          const Divider(height: 1),
-          const Gap(15),
+          const Divider(),
+          const Gap(10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _miniDetail(Icons.public, user['country'] ?? "N/A"),
-              _miniDetail(
-                Icons.devices,
-                request['mediaUrls']?['platform'] ?? "N/A",
+              _infoRow(Icons.public, user['country'] ?? "N/A"),
+              _infoRow(
+                Icons.history,
+                isVerified ? "Verified User" : "New Request",
               ),
             ],
           ),
@@ -245,25 +245,29 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
                   ),
                   child: const Text(
                     "Decline",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               const Gap(10),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => _approveRequest(uId, rId),
+                  onPressed: () => isVerified
+                      ? _removeBlueTick(uId, rId)
+                      : _approveRequest(uId, rId),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4318FF),
+                    backgroundColor: isVerified
+                        ? Colors.orange
+                        : const Color(0xFF4318FF),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    "Approve",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  child: Text(
+                    isVerified ? "Remove Tick" : "Approve",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -275,29 +279,30 @@ class _VerifyUsersProState extends State<VerifyUsersPro> {
   }
 
   Widget _statusBadge(String status) {
+    Color badgeColor = status == "approved" ? Colors.green : Colors.orange;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
+        color: badgeColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         status.toUpperCase(),
-        style: const TextStyle(
-          color: Colors.orange,
-          fontSize: 9,
+        style: TextStyle(
+          color: badgeColor,
+          fontSize: 10,
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _miniDetail(IconData icon, String text) {
+  Widget _infoRow(IconData icon, String text) {
     return Row(
       children: [
         Icon(icon, size: 14, color: Colors.grey[400]),
         const Gap(5),
-        Text(text, style: TextStyle(fontSize: 11, color: Colors.grey[700])),
+        Text(text, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
       ],
     );
   }
