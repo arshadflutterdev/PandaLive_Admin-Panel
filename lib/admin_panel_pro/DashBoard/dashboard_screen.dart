@@ -25,8 +25,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             .collection("userProfile")
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           var docs = snapshot.data!.docs;
 
