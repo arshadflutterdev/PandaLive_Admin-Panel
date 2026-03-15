@@ -20,6 +20,7 @@ class _GiftScreenState extends State<GiftScreen> {
 
   PlatformFile? _selectedFile;
   bool _isUploading = false;
+  double _uploadProgress = 0.0; // Real-time progress variable
 
   @override
   void initState() {
@@ -35,43 +36,85 @@ class _GiftScreenState extends State<GiftScreen> {
     super.dispose();
   }
 
-  // File picker function
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['png', 'jpg', 'gif', 'webp', 'json'],
-    );
+  Future<void> _pickFile(StateSetter setDialogState) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['png', 'jpg', 'gif', 'webp', 'json'],
+        withData: true,
+      );
 
-    if (result != null) {
-      setState(() {
-        _selectedFile = result.files.first;
-      });
+      if (result != null) {
+        setDialogState(() {
+          _selectedFile = result.files.first;
+        });
+        print("DEBUG: File selected - ${_selectedFile!.name}");
+      }
+    } catch (e) {
+      print("DEBUG ERROR (PickFile): $e");
+      _msg("Error picking file: $e");
     }
   }
 
   Future<void> _addGift() async {
-    if (_nameController.text.isEmpty ||
+    // 1. Double-click protection aur field check
+    if (_isUploading ||
+        _nameController.text.isEmpty ||
         _coinController.text.isEmpty ||
         _selectedFile == null) {
-      _msg("Please fill all fields and select a file");
+      if (!_isUploading) _msg("Please fill all fields");
       return;
     }
 
-    setState(() => _isUploading = true);
+    setState(() {
+      _isUploading = true;
+      _uploadProgress = 0.0;
+    });
 
     try {
-      // 1. Upload to Firebase Storage
+      print("DEBUG: Starting Upload Process...");
       String fileName =
           "${DateTime.now().millisecondsSinceEpoch}_${_selectedFile!.name}";
       Reference storageRef = FirebaseStorage.instance.ref().child(
         "gifts/$fileName",
       );
 
-      UploadTask uploadTask = storageRef.putData(_selectedFile!.bytes!);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: _selectedFile!.name.endsWith('.json')
+            ? 'application/json'
+            : 'image/jpeg', // JPG ke liye image/jpeg behtar hai
+      );
+
+      // Start Upload Task
+      UploadTask uploadTask = storageRef.putData(
+        _selectedFile!.bytes!,
+        metadata,
+      );
+
+      // Real-time listener for progress
+      uploadTask.snapshotEvents.listen(
+        (TaskSnapshot snapshot) {
+          if (snapshot.totalBytes > 0) {
+            double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            print("DEBUG: Progress: ${(progress * 100).toStringAsFixed(2)}%");
+
+            if (mounted) {
+              setState(() {
+                _uploadProgress = progress;
+              });
+            }
+          }
+        },
+        onError: (e) {
+          print("DEBUG ERROR (Upload Stream): $e");
+          setState(() => _isUploading = false);
+        },
+      );
+
       TaskSnapshot snapshot = await uploadTask;
       String downloadUrl = await snapshot.ref.getDownloadURL();
+      print("DEBUG: Success! URL: $downloadUrl");
 
-      // 2. Save to Firestore
       await FirebaseFirestore.instance.collection('gifts').add({
         'name': _nameController.text.trim(),
         'coin': int.tryParse(_coinController.text) ?? 0,
@@ -81,12 +124,13 @@ class _GiftScreenState extends State<GiftScreen> {
       });
 
       if (mounted) Navigator.pop(context);
-      _msg("New Gift Added Successfully!");
+      _msg("Gift Uploaded Successfully!");
       _clearFields();
     } catch (e) {
-      _msg("Upload Error: $e");
+      print("DEBUG ERROR (Main Catch): $e");
+      _msg("Upload failed: $e");
     } finally {
-      setState(() => _isUploading = false);
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
@@ -94,38 +138,34 @@ class _GiftScreenState extends State<GiftScreen> {
     _coinController.clear();
     _nameController.clear();
     _selectedFile = null;
-  }
-
-  Future<void> _deleteGift(String id, String imageUrl) async {
-    try {
-      await FirebaseFirestore.instance.collection('gifts').doc(id).delete();
-      // Optional: Delete from Storage as well
-      await FirebaseStorage.instance.refFromURL(imageUrl).delete();
-      _msg("Gift Deleted");
-    } catch (e) {
-      _msg("Delete Error: $e");
-    }
+    _uploadProgress = 0.0;
   }
 
   void _msg(String text) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text), behavior: SnackBarBehavior.floating),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
+      backgroundColor: const Color(0xFFF0F2F5),
+      appBar: AppBar(
+        title: Text(
+          "PandaLive Gifts",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddGiftDialog,
         backgroundColor: const Color(0xFF6C63FF),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          "Add New Gift",
-          style: TextStyle(color: Colors.white),
-        ),
+        icon: const Icon(Icons.add_to_photos, color: Colors.white),
+        label: const Text("Create Gift", style: TextStyle(color: Colors.white)),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -137,18 +177,25 @@ class _GiftScreenState extends State<GiftScreen> {
             return const Center(child: CircularProgressIndicator());
           final gifts = snapshot.data!.docs;
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(20),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: screenWidth < 600 ? 2 : 5,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-              mainAxisExtent: 280,
-            ),
-            itemCount: gifts.length,
-            itemBuilder: (context, index) {
-              var gift = gifts[index].data() as Map<String, dynamic>;
-              return _buildGiftCard(gift, gifts[index].id);
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              int crossAxisCount = constraints.maxWidth < 600
+                  ? 2
+                  : (constraints.maxWidth < 1200 ? 4 : 6);
+              return GridView.builder(
+                padding: const EdgeInsets.all(20),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 0.75,
+                ),
+                itemCount: gifts.length,
+                itemBuilder: (context, index) {
+                  var gift = gifts[index].data() as Map<String, dynamic>;
+                  return _buildGiftCard(gift, gifts[index].id);
+                },
+              );
             },
           );
         },
@@ -157,169 +204,166 @@ class _GiftScreenState extends State<GiftScreen> {
   }
 
   Widget _buildGiftCard(Map<String, dynamic> gift, String id) {
-    String url = gift['image'] ?? "";
-    bool isAnim = gift['isAnimation'] ?? false;
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20),
         ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: isAnim
-                  ? Lottie.network(url, repeat: true)
-                  : Image.network(url, fit: BoxFit.contain),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+              child: gift['isAnimation'] == true
+                  ? Lottie.network(gift['image'], fit: BoxFit.contain)
+                  : Image.network(
+                      gift['image'],
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stack) =>
+                          const Icon(Icons.broken_image, size: 50),
+                    ),
             ),
           ),
-          Text(
-            gift['name'] ?? "No Name",
-            style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-          ),
-          if (isAnim)
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: _badge("ANIMATED", Colors.blue),
-            ),
           Padding(
-            padding: const EdgeInsets.all(15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Column(
               children: [
                 Text(
-                  "${gift['coin']} 🪙",
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w800,
-                    color: Colors.orange[800],
+                  gift['name'] ?? "Gift",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Gap(4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${gift['coin']}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const Gap(4),
+                    const Icon(
+                      Icons.monetization_on,
+                      size: 14,
+                      color: Colors.orange,
+                    ),
+                  ],
                 ),
                 IconButton(
-                  onPressed: () => _deleteGift(id, url),
+                  onPressed: () => FirebaseFirestore.instance
+                      .collection('gifts')
+                      .doc(id)
+                      .delete(),
                   icon: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 20,
+                    Icons.delete_sweep_outlined,
+                    color: Colors.redAccent,
                   ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _badge(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 9,
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
       ),
     );
   }
 
   void _showAddGiftDialog() {
-    _clearFields();
     showDialog(
       context: context,
-      barrierDismissible: !_isUploading,
+      barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(24),
             ),
-            title: Text(
-              "Add Professional Gift",
-              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _dialogField(_nameController, "Gift Name", Icons.label_outline),
-                const Gap(15),
-                _dialogField(
-                  _coinController,
-                  "Coin Value",
-                  Icons.monetization_on_outlined,
-                  isNumber: true,
-                ),
-                const Gap(20),
-
-                // File Selector UI
-                GestureDetector(
-                  onTap: () async {
-                    await _pickFile();
-                    setDialogState(() {}); // Refresh dialog UI
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(0.3),
-                        style: BorderStyle.solid,
-                      ),
+            title: const Text("Add Professional Gift"),
+            content: SizedBox(
+              width: 400,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _dialogField(_nameController, "Gift Name", Icons.edit),
+                    const Gap(15),
+                    _dialogField(
+                      _coinController,
+                      "Coin Value",
+                      Icons.generating_tokens,
+                      isNumber: true,
                     ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          _selectedFile == null
-                              ? Icons.cloud_upload_outlined
-                              : Icons.check_circle,
-                          color: _selectedFile == null
-                              ? Colors.grey
-                              : Colors.green,
-                          size: 30,
-                        ),
-                        const Gap(8),
-                        Text(
-                          _selectedFile?.name ?? "Click to Upload Image/JSON",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.blueGrey,
+                    const Gap(20),
+                    GestureDetector(
+                      onTap: () => _pickFile(setDialogState),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: Colors.blueAccent.withOpacity(0.2),
                           ),
                         ),
-                      ],
+                        child: Column(
+                          children: [
+                            Icon(
+                              _selectedFile == null
+                                  ? Icons.upload_file
+                                  : Icons.task_alt,
+                              color: _selectedFile == null
+                                  ? Colors.blueAccent
+                                  : Colors.green,
+                              size: 40,
+                            ),
+                            const Gap(10),
+                            Text(
+                              _selectedFile?.name ??
+                                  "Tap to Select SVGA/WebP/JSON",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    // Real-time Progress Bar in Dialog
+                    if (_isUploading) ...[
+                      const Gap(20),
+                      LinearProgressIndicator(value: _uploadProgress),
+                      const Gap(5),
+                      Text(
+                        "${(_uploadProgress * 100).toStringAsFixed(0)}%",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ],
                 ),
-                if (_isUploading)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 15),
-                    child: LinearProgressIndicator(),
-                  ),
-              ],
+              ),
             ),
             actions: [
               TextButton(
-                onPressed: _isUploading ? null : () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
               ),
               ElevatedButton(
+                onPressed: _isUploading ? null : _addGift,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6C63FF),
                   foregroundColor: Colors.white,
                 ),
-                onPressed: _isUploading ? null : _addGift,
                 child: Text(_isUploading ? "Uploading..." : "Save Gift"),
               ),
             ],
@@ -339,9 +383,14 @@ class _GiftScreenState extends State<GiftScreen> {
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, size: 20),
+        prefixIcon: Icon(icon),
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }
