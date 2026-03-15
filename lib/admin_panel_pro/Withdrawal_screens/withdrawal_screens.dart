@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Copy feature ke liye
+import 'package:flutter/services.dart';
 
 class WithdrawalScreens extends StatefulWidget {
   const WithdrawalScreens({super.key});
+
   @override
   State<WithdrawalScreens> createState() => _WithdrawalScreensState();
 }
@@ -21,13 +22,18 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
 
   @override
   Widget build(BuildContext context) {
+    // Screen width check karne ke liye
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isMobile = screenWidth < 600;
+
     return Scaffold(
       backgroundColor: const Color(0xffF1F4F9),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(isMobile ? 12.0 : 25.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildCustomTabBar(),
+            _buildCustomTabBar(isMobile),
             const SizedBox(height: 20),
             Expanded(
               child: Container(
@@ -42,17 +48,44 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
                   ],
                 ),
                 child: Column(
+                  crossAxisAlignment: isMobile
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
                   children: [
-                    _buildTableToolbar(),
-                    _buildTableHeader(),
+                    _buildTableToolbar(isMobile),
                     Expanded(
-                      child: TabBarView(
-                        controller: tabController,
-                        children: [
-                          _buildFirebaseDataTable("Pending"),
-                          _buildFirebaseDataTable("Approved"),
-                          _buildFirebaseDataTable("Rejected"),
-                        ],
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SizedBox(
+                          // Mobile par table ko width denge taaki columns cut na ho, desktop par full width
+                          width: isMobile
+                              ? 900
+                              : screenWidth - (isMobile ? 24 : 50),
+                          child: Column(
+                            children: [
+                              _buildTableHeader(),
+                              Expanded(
+                                child: TabBarView(
+                                  controller: tabController,
+                                  children: [
+                                    _buildFirebaseDataTable(
+                                      "Pending",
+                                      isMobile,
+                                    ),
+                                    _buildFirebaseDataTable(
+                                      "Approved",
+                                      isMobile,
+                                    ),
+                                    _buildFirebaseDataTable(
+                                      "Rejected",
+                                      isMobile,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -65,7 +98,7 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     );
   }
 
-  Widget _buildFirebaseDataTable(String statusFilter) {
+  Widget _buildFirebaseDataTable(String statusFilter, bool isMobile) {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection("userProfile")
@@ -79,29 +112,35 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text("No $statusFilter requests found."));
+          return Container(
+            alignment: isMobile ? Alignment.topLeft : Alignment.center,
+            padding: const EdgeInsets.all(40),
+            child: Text(
+              "No $statusFilter requests found.",
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          );
         }
 
         var docs = snapshot.data!.docs;
 
         return ListView.separated(
           itemCount: docs.length,
+          padding: EdgeInsets.zero,
           separatorBuilder: (context, index) =>
               Divider(height: 1, color: Colors.grey.shade100),
           itemBuilder: (context, index) {
             var data = docs[index].data() as Map<String, dynamic>;
-
             String name = data['name'] ?? "No Name";
             String binanceId = data['binanceId'] ?? "N/A";
             var dollars = data['dollars'] ?? 0;
             String status = data['withdrawlstatus'] ?? "Pending";
 
-            return Padding(
+            return Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               child: Row(
                 children: [
                   _cell("${index + 1}", 1),
-                  // 1. USERNAME
                   Expanded(
                     flex: 3,
                     child: Row(
@@ -115,7 +154,9 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
                             0xff7C78FF,
                           ).withOpacity(0.1),
                           child: data['userimage'] == null
-                              ? Text(name[0].toUpperCase())
+                              ? Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : "?",
+                                )
                               : null,
                         ),
                         const SizedBox(width: 10),
@@ -129,12 +170,10 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
                       ],
                     ),
                   ),
-                  // 2. GATEWAY
                   const Expanded(
                     flex: 2,
                     child: Text("Binance", style: TextStyle(fontSize: 13)),
                   ),
-                  // 3. GATEWAY ID (Binance ID)
                   Expanded(
                     flex: 2,
                     child: Row(
@@ -155,17 +194,13 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: binanceId));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("ID Copied"),
-                                duration: Duration(seconds: 1),
-                              ),
+                              const SnackBar(content: Text("ID Copied")),
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-                  // 4. DOLLARS
                   Expanded(
                     flex: 2,
                     child: Text(
@@ -177,12 +212,10 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
                       ),
                     ),
                   ),
-                  // 5. DATE
                   const Expanded(
                     flex: 2,
-                    child: Text("3/10/2026", style: TextStyle(fontSize: 12)),
+                    child: Text("3/15/2026", style: TextStyle(fontSize: 12)),
                   ),
-                  // 6. STATUS BADGE
                   Expanded(flex: 2, child: _buildStatusBadge(status)),
                 ],
               ),
@@ -190,30 +223,6 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
           },
         );
       },
-    );
-  }
-
-  Widget _buildStatusBadge(String status) {
-    Color color = Colors.orange;
-    if (status == "Approved") color = Colors.green;
-    if (status == "Rejected") color = Colors.red;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.5)),
-      ),
-      child: Text(
-        status,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
     );
   }
 
@@ -249,9 +258,32 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     );
   }
 
-  Widget _buildCustomTabBar() {
+  Widget _buildStatusBadge(String status) {
+    Color color = status == "Approved"
+        ? Colors.green
+        : (status == "Rejected" ? Colors.red : Colors.orange);
     return Container(
-      width: 350,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        status,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomTabBar(bool isMobile) {
+    return Container(
+      width: isMobile ? double.infinity : 350,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -267,7 +299,6 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
         unselectedLabelColor: Colors.grey,
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
-
         tabs: const [
           Tab(text: "Pending"),
           Tab(text: "Accepted"),
@@ -277,12 +308,16 @@ class _WithdrawalScreensState extends State<WithdrawalScreens>
     );
   }
 
-  Widget _buildTableToolbar() {
-    return const Padding(
-      padding: EdgeInsets.all(20),
-      child: Text(
-        "Pending Withdraw Request",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildTableToolbar(bool isMobile) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Text(
+          "Withdrawal Requests",
+          textAlign: isMobile ? TextAlign.left : TextAlign.center,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

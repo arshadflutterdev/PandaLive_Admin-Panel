@@ -9,7 +9,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Controllers for text fields
   final TextEditingController nameController = TextEditingController(
     text: "Al Zahrani",
   );
@@ -20,219 +19,229 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD), // Light professional background
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "App Setting",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
+      backgroundColor: const Color(0xFFF8F9FD),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Check if screen is mobile or desktop
+          bool isMobile = constraints.maxWidth < 800;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Left Section: Profile Avatar
-                Expanded(
-                  flex: 1,
-                  child: _buildCard(
-                    child: Column(
-                      children: [
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Profile Avatar",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color(
-                                    0xFF6C63FF,
-                                  ).withOpacity(0.5),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Image(
-                                  image: AssetImage(AppImages.user),
-                                  height: 150,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF6C63FF),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Al Zahrani",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
+                const Text(
+                  "App Setting",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-                const SizedBox(width: 20),
-                // 2. Right Section: Edit Profile
-                Expanded(
-                  flex: 1,
-                  child: _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Edit Profile",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 25),
-                        _buildLabel("Name"),
-                        _buildTextField(nameController),
-                        const SizedBox(height: 20),
-                        _buildLabel("Email"),
-                        _buildTextField(emailController),
-                        const SizedBox(height: 30),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(
-                                0xFF4CAF50,
-                              ), // Green Submit button
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 30,
-                                vertical: 15,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              "Submit",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                const SizedBox(height: 20),
+
+                // Top Section: Avatar and Edit Profile
+                if (isMobile)
+                  Column(
+                    children: [
+                      _buildAvatarSection(),
+                      const SizedBox(height: 20),
+                      _buildEditProfileSection(),
+                    ],
+                  )
+                else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: _buildAvatarSection()),
+                      const SizedBox(width: 20),
+                      Expanded(child: _buildEditProfileSection()),
+                    ],
                   ),
+
+                const SizedBox(height: 20),
+
+                // Bottom Section: Change Password
+                // Responsive width: Desktop par 50% aur Mobile par full width
+                SizedBox(
+                  width: isMobile
+                      ? double.infinity
+                      : constraints.maxWidth * 0.49,
+                  child: _buildChangePasswordSection(),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            // 3. Bottom Section: Change Password
-            _buildCard(
-              width: MediaQuery.of(context).size.width * 0.49,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Change Password",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 25),
-                  _buildLabel("Old Password"),
-                  _buildTextField(TextEditingController(), isPassword: true),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel("New Password"),
-                            _buildTextField(
-                              TextEditingController(),
-                              isPassword: true,
-                              hint: "Enter New Password",
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildLabel("Confirm Password"),
-                            _buildTextField(
-                              TextEditingController(),
-                              isPassword: true,
-                              hint: "Enter Confirm Password",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 15,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  // Helper to build Cards
+  // --- UI Sections extracted for clean responsiveness ---
+
+  Widget _buildAvatarSection() {
+    return _buildCard(
+      child: Column(
+        children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Profile Avatar",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          const SizedBox(height: 40),
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFF6C63FF).withOpacity(0.5),
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image(image: AssetImage(AppImages.user), height: 150),
+                ),
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF6C63FF),
+                  shape: BoxShape.circle,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.edit, color: Colors.white, size: 18),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Al Zahrani",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditProfileSection() {
+    return _buildCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Edit Profile",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 25),
+          _buildLabel("Name"),
+          _buildTextField(nameController),
+          const SizedBox(height: 20),
+          _buildLabel("Email"),
+          _buildTextField(emailController),
+          const SizedBox(height: 30),
+          Align(alignment: Alignment.centerRight, child: _buildSubmitButton()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChangePasswordSection() {
+    return _buildCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Change Password",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 25),
+          _buildLabel("Old Password"),
+          _buildTextField(TextEditingController(), isPassword: true),
+          const SizedBox(height: 20),
+          LayoutBuilder(
+            builder: (context, subConstraints) {
+              // Internal Row responsiveness for passwords
+              if (subConstraints.maxWidth < 500) {
+                return Column(
+                  children: [
+                    _buildLabel("New Password"),
+                    _buildTextField(
+                      TextEditingController(),
+                      isPassword: true,
+                      hint: "Enter New Password",
+                    ),
+                    const SizedBox(height: 20),
+                    _buildLabel("Confirm Password"),
+                    _buildTextField(
+                      TextEditingController(),
+                      isPassword: true,
+                      hint: "Enter Confirm Password",
+                    ),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel("New Password"),
+                        _buildTextField(
+                          TextEditingController(),
+                          isPassword: true,
+                          hint: "Enter New Password",
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel("Confirm Password"),
+                        _buildTextField(
+                          TextEditingController(),
+                          isPassword: true,
+                          hint: "Enter Confirm Password",
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 30),
+          Align(alignment: Alignment.centerRight, child: _buildSubmitButton()),
+        ],
+      ),
+    );
+  }
+
+  // --- Helper Widgets ---
+
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF4CAF50),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: const Text("Submit", style: TextStyle(color: Colors.white)),
+    );
+  }
+
   Widget _buildCard({required Widget child, double? width}) {
     return Container(
       width: width,
@@ -252,7 +261,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper for Labels
   Widget _buildLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -266,7 +274,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper for TextFields
   Widget _buildTextField(
     TextEditingController controller, {
     bool isPassword = false,
