@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart'; // Add this for animations
+import 'package:lottie/lottie.dart';
 
 class GiftScreen extends StatefulWidget {
   const GiftScreen({super.key});
@@ -14,39 +14,43 @@ class GiftScreen extends StatefulWidget {
 class _GiftScreenState extends State<GiftScreen> {
   late TextEditingController _coinController;
   late TextEditingController _imageController;
+  late TextEditingController _nameController; // Naya controller naam ke liye
 
   @override
   void initState() {
     super.initState();
     _coinController = TextEditingController();
     _imageController = TextEditingController();
+    _nameController = TextEditingController();
   }
 
   @override
   void dispose() {
     _coinController.dispose();
     _imageController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
-  // Check if link is a Lottie Animation
-  bool _isAnimation(String url) {
-    return url.toLowerCase().contains('.json');
-  }
+  bool _isAnimation(String url) => url.toLowerCase().contains('.json');
 
   Future<void> _addGift() async {
-    if (_coinController.text.isEmpty || _imageController.text.isEmpty) {
+    if (_coinController.text.isEmpty ||
+        _imageController.text.isEmpty ||
+        _nameController.text.isEmpty) {
       _msg("Please fill all fields");
       return;
     }
     try {
       await FirebaseFirestore.instance.collection('gifts').add({
+        'name': _nameController.text.trim(),
         'coin': int.tryParse(_coinController.text) ?? 0,
         'image': _imageController.text.trim(),
         'createdAt': FieldValue.serverTimestamp(),
       });
       _coinController.clear();
       _imageController.clear();
+      _nameController.clear();
       if (mounted) Navigator.pop(context);
       _msg("New Gift Added!");
     } catch (e) {
@@ -66,6 +70,8 @@ class _GiftScreenState extends State<GiftScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
@@ -73,14 +79,19 @@ class _GiftScreenState extends State<GiftScreen> {
           "PandaLive Gifts",
           style: GoogleFonts.inter(fontWeight: FontWeight.bold),
         ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: IconButton(
-              onPressed: _showAddGiftDialog,
-              icon: const Icon(Icons.add_circle, color: Colors.blue, size: 30),
+          IconButton(
+            onPressed: _showAddGiftDialog,
+            icon: const Icon(
+              Icons.add_circle,
+              color: Color(0xFF6C63FF),
+              size: 30,
             ),
           ),
+          const Gap(10),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -96,10 +107,10 @@ class _GiftScreenState extends State<GiftScreen> {
           return GridView.builder(
             padding: const EdgeInsets.all(15),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).size.width < 600 ? 2 : 5,
+              crossAxisCount: screenWidth < 600 ? 2 : 5,
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
-              mainAxisExtent: 220,
+              mainAxisExtent: 250, // Height thori barha di naam ke liye
             ),
             itemCount: gifts.length,
             itemBuilder: (context, index) {
@@ -114,24 +125,26 @@ class _GiftScreenState extends State<GiftScreen> {
 
   Widget _buildGiftCard(Map<String, dynamic> gift, String id) {
     String url = gift['image'] ?? "";
+    String giftName = gift['name'] ?? "No Name";
     bool isAnim = _isAnimation(url);
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+        ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: isAnim
                   ? Lottie.network(
                       url,
-                      repeat: true,
-                      reverse: true,
                       errorBuilder: (c, e, s) =>
                           const Icon(Icons.videocam_off_outlined),
                     )
@@ -141,30 +154,46 @@ class _GiftScreenState extends State<GiftScreen> {
                     ),
             ),
           ),
+          Text(
+            giftName,
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const Gap(4),
           if (isAnim)
-            const Text(
+            Text(
               "ANIMATED",
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 fontSize: 9,
                 color: Colors.blue,
                 fontWeight: FontWeight.bold,
               ),
             ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.all(12),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "${gift['coin']} 🪙",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "${gift['coin']} 🪙",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ),
-                IconButton(
-                  onPressed: () => _deleteGift(id),
-                  icon: const Icon(
+                const Gap(5),
+                GestureDetector(
+                  onTap: () => _deleteGift(id),
+                  child: const Icon(
                     Icons.delete_outline,
                     color: Colors.red,
-                    size: 20,
+                    size: 22,
                   ),
                 ),
               ],
@@ -178,37 +207,59 @@ class _GiftScreenState extends State<GiftScreen> {
   void _showAddGiftDialog() {
     _coinController.clear();
     _imageController.clear();
+    _nameController.clear();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Add Gift / Animation"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _imageController,
-              decoration: const InputDecoration(
-                labelText: "URL (Image or Lottie JSON)",
-                border: OutlineInputBorder(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          "Add New Gift",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: "Gift Name",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const Gap(15),
-            TextField(
-              controller: _coinController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Coins",
-                border: OutlineInputBorder(),
+              const Gap(15),
+              TextField(
+                controller: _imageController,
+                decoration: const InputDecoration(
+                  labelText: "URL (JSON or Image)",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-          ],
+              const Gap(15),
+              TextField(
+                controller: _coinController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Coins Amount",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text("Cancel"),
           ),
-          ElevatedButton(onPressed: _addGift, child: const Text("Save")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6C63FF),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: _addGift,
+            child: const Text("Save Gift"),
+          ),
         ],
       ),
     );
