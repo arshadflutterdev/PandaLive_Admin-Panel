@@ -30,7 +30,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
   List<Widget> appscreens = [
     DashboardScreen(), // 0
     AppUsersScreen(), // 1
-    VerifyusersPro(), // 2
+    VerifyUsersPro(), // 2
     GiftScreen(), // 3
     Placeholder(), // 4 <-- Yahan Reactions ki screen rakhein (Abhi ke liye Placeholder)
     CurrencyScreens(), // 5
