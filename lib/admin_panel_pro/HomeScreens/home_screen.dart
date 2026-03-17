@@ -10,6 +10,7 @@ import 'package:panda_adminpanel/admin_panel_pro/Gifts/gift_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/LogoutScreen/logout_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Order_History/order_history.dart';
 import 'package:panda_adminpanel/admin_panel_pro/ProfileScreen/profile_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/ReactionScreens/reactions_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Reports/reports_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Supports/team_support.dart';
 import 'package:panda_adminpanel/admin_panel_pro/User_Manage_Screens/all_users.dart';
@@ -32,7 +33,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     AppUsersScreen(), // 1
     VerifyUsersPro(), // 2
     GiftScreen(), // 3
-    Placeholder(), // 4 <-- Yahan Reactions ki screen rakhein (Abhi ke liye Placeholder)
+    ReactionsScreen(), // 4 <-- Yahan Reactions ki screen rakhein (Abhi ke liye Placeholder)
     CurrencyScreens(), // 5
     WithdrawalScreens(), // 6
     CoinsPlans(), // 7
