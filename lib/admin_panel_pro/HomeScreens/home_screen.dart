@@ -40,8 +40,9 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     CoinsPlans(), // 7
     OrderHistory(), // 8
     SupportAdminScreen(), // 9
-    AllowLiveUser(),
+
     LiveStreamers(), // 10
+    AllowLiveUser(),
     SettingsScreen(), // 11
     ProfileScreen(), // 12
     LogoutScreen(), // 13
