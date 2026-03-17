@@ -67,6 +67,7 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
   }
 
   // Detailed Review Modal
+  // Detailed Review Modal with 3 Images
   void _openReviewModal(String uid, Map<String, dynamic> user) async {
     showModalBottomSheet(
       context: context,
@@ -93,7 +94,6 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
 
             return Column(
               children: [
-                // Top Indicator
                 const Gap(10),
                 Container(
                   width: 50,
@@ -108,7 +108,7 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
                   child: ListView(
                     padding: const EdgeInsets.all(20),
                     children: [
-                      // User Basic Info Header
+                      // User Profile Header
                       Row(
                         children: [
                           CircleAvatar(
@@ -144,13 +144,13 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
                       ),
                       const Divider(height: 30),
 
-                      // Detailed Info Grid
+                      // User Info Grid
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           _infoTile(
                             "Country",
-                            user['country'] ?? "N/A",
+                            docData['country'] ?? user['country'] ?? "N/A",
                             Icons.public,
                           ),
                           _infoTile(
@@ -167,32 +167,61 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
                       ),
                       const Gap(25),
 
-                      // Document Images
-                      _buildImageSection(
-                        "ID Card Front Side",
-                        docData['idCardFront'],
+                      // Document Images Section
+                      const Text(
+                        "Verification Documents",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const Gap(20),
+                      const Gap(15),
+
                       _buildImageSection(
                         "Live Face Selfie",
                         docData['facePic'],
                       ),
-                      const Gap(100), // Space for buttons
+                      const Gap(20),
+                      _buildImageSection(
+                        "ID Card (Front Side)",
+                        docData['idCardFront'],
+                      ),
+                      const Gap(20),
+                      _buildImageSection(
+                        "ID Card (Back Side)",
+                        docData['idCardBack'],
+                      ), // Ab back side bhi show hogi
+
+                      const Gap(100),
                     ],
                   ),
                 ),
 
-                // Action Buttons
-                Padding(
+                // Fixed Action Buttons
+                Container(
                   padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
+                  ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: TextButton(
+                        child: OutlinedButton(
                           onPressed: () => _handleRejection(uid),
-                          style: TextButton.styleFrom(
-                            fixedSize: Size.fromHeight(55),
+                          style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                            // height: 55,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                           ),
                           child: const Text(
                             "REJECT",
@@ -206,7 +235,7 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
                           onPressed: () => _handleApproval(uid),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
-                            fixedSize: Size.fromHeight(55),
+                            // height: 55,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
@@ -231,6 +260,64 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
     );
   }
 
+  // Improved Image Section with Label
+  Widget _buildImageSection(String title, String? base64Str) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        const Gap(8),
+        GestureDetector(
+          onTap: () {
+            // Image full screen dekhne ke liye yahan logic add kar sakte hain
+          },
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: base64Str != null
+                  ? Image.memory(
+                      base64Decode(base64Str),
+                      fit: BoxFit.cover,
+                      errorBuilder: (c, e, s) => const SizedBox(
+                        height: 150,
+                        child: Center(
+                          child: Icon(Icons.broken_image, color: Colors.red),
+                        ),
+                      ),
+                    )
+                  : const SizedBox(
+                      height: 150,
+                      child: Center(child: Text("Image Missing")),
+                    ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _infoTile(String label, String value, IconData icon) {
     return Column(
       children: [
@@ -245,38 +332,38 @@ class _AllowLiveUserState extends State<AllowLiveUser> {
     );
   }
 
-  Widget _buildImageSection(String title, String? base64Str) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        const Gap(10),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.grey[200]!),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: base64Str != null
-                ? Image.memory(
-                    base64Decode(base64Str),
-                    fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => const Icon(Icons.broken_image),
-                  )
-                : const SizedBox(
-                    height: 150,
-                    child: Center(child: Text("Image Missing")),
-                  ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildImageSection(String title, String? base64Str) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         title,
+  //         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  //       ),
+  //       const Gap(10),
+  //       Container(
+  //         width: double.infinity,
+  //         decoration: BoxDecoration(
+  //           borderRadius: BorderRadius.circular(15),
+  //           border: Border.all(color: Colors.grey[200]!),
+  //         ),
+  //         child: ClipRRect(
+  //           borderRadius: BorderRadius.circular(15),
+  //           child: base64Str != null
+  //               ? Image.memory(
+  //                   base64Decode(base64Str),
+  //                   fit: BoxFit.cover,
+  //                   errorBuilder: (c, e, s) => const Icon(Icons.broken_image),
+  //                 )
+  //               : const SizedBox(
+  //                   height: 150,
+  //                   child: Center(child: Text("Image Missing")),
+  //                 ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
