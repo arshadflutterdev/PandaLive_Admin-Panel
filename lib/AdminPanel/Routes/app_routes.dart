@@ -15,7 +15,7 @@ import 'package:panda_adminpanel/admin_panel_pro/HomeScreens/home_screen.dart';
 import 'package:panda_adminpanel/main_screen.dart';
 
 class AppRoutes {
-  static const String login = "/AuthScreen";
+  static const String login = "/LoginScreen";
   static const String home = "/HomeScreen";
   static const String sidebar = "/SideBarScreen";
   static const String graph = "/GraphScreen";
@@ -32,7 +32,7 @@ class AppRoutes {
   //Admin Pro
   static const homepro = "/HomeScreenPro";
   static final List<GetPage> routes = [
-    GetPage(name: login, page: () => AuthScreen()),
+    GetPage(name: login, page: () => LoginScreen()),
     GetPage(name: mainscreen, page: () => MainScreen()),
     GetPage(name: home, page: () => HomeScreen()),
     GetPage(name: sidebar, page: () => SideBarScreen()),
