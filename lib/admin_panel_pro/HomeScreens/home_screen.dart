@@ -7,6 +7,7 @@ import 'package:panda_adminpanel/admin_panel_pro/Coins_Plans/coins_plands.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Currency_Screens/currency_screens.dart';
 import 'package:panda_adminpanel/admin_panel_pro/DashBoard/dashboard_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Gifts/gift_screen.dart';
+import 'package:panda_adminpanel/admin_panel_pro/Live%20Videos/allow_live.dart';
 import 'package:panda_adminpanel/admin_panel_pro/LogoutScreen/logout_screen.dart';
 import 'package:panda_adminpanel/admin_panel_pro/Order_History/order_history.dart';
 import 'package:panda_adminpanel/admin_panel_pro/ProfileScreen/profile_screen.dart';
@@ -39,6 +40,7 @@ class _HomeScreenProState extends State<HomeScreenPro> {
     CoinsPlans(), // 7
     OrderHistory(), // 8
     SupportAdminScreen(), // 9
+    AllowLiveUser(),
     LiveStreamers(), // 10
     SettingsScreen(), // 11
     ProfileScreen(), // 12
@@ -150,11 +152,12 @@ class _HomeScreenProState extends State<HomeScreenPro> {
               _sectionTitle("REPORTS & REQUESTS"),
               _navItem(9, Icons.help, "Support Request", isMobile),
               _navItem(10, Icons.report, "Live Video", isMobile),
+              _navItem(11, Icons.report, "Allow Live", isMobile),
 
               _sectionTitle("GENERAL"),
-              _navItem(11, Icons.settings, "Settings", isMobile),
-              _navItem(12, Icons.person_2_outlined, "Profile", isMobile),
-              _navItem(13, Icons.logout, "Logout", isMobile),
+              _navItem(12, Icons.settings, "Settings", isMobile),
+              _navItem(13, Icons.person_2_outlined, "Profile", isMobile),
+              _navItem(14, Icons.logout, "Logout", isMobile),
             ],
           ),
         ),
