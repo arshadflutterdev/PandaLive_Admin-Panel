@@ -494,7 +494,7 @@ class AdminAuthController extends GetxController {
   final String masterEmail = "arshadbaloch0307@gmail.com";
 
   Future<void> loginAdmin() async {
-    if (emailController.text.isEmpty || passwjjjjjjjjjjjjjjjjjjjjjjjjjjordController.text.isEmpty) {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar(
         "Error",
         "Fields cannot be empty",
@@ -512,7 +512,7 @@ class AdminAuthController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      String uid = userCredenjjjjjjjjjjjjjjjjjtial.user!.uid;
+      String uid = userCredential.user!.uid;
       String currentEmail = emailController.text.trim();
 
       // Original Name nikalne ki koshish (Firebase Auth se)
@@ -539,7 +539,7 @@ class AdminAuthController extends GetxController {
             (userDoc.data() as Map<String, dynamic>)['name'] == null) {
           updateData['name'] = originalName;
         }
-hhhhhhhhhh
+
         await userRef.set(updateData, SetOptions(merge: true));
 
         // Refresh document after update
@@ -552,7 +552,7 @@ hhhhhhhhhh
 
         // Success Snackbar mein Original Name show hoga
         String finalName = userDoc['name'] ?? originalName;
-jjjjjjjjjjjjjjjjjjjjjjjjjj
+
         Get.offAll(() => HomeScreenPro()); // Ya jo bhi aapka route hai
         Get.snackbar(
           "Success",
@@ -575,7 +575,7 @@ jjjjjjjjjjjjjjjjjjjjjjjjjj
       Get.snackbar(
         "Login Failed",
         "Invalid Credentials",
-        backgroundColor: Colors.red,jjjjjjjjjjjjjjjjjjjjjjjj
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
     }
