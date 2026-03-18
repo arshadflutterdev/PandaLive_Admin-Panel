@@ -514,8 +514,6 @@ class AdminAuthController extends GetxController {
 
       String uid = userCredential.user!.uid;
       String currentEmail = emailController.text.trim();
-
-      // Original Name nikalne ki koshish (Firebase Auth se)
       String originalName = userCredential.user!.displayName ?? "Admin User";
 
       // 2. userProfile collection check karein
@@ -524,7 +522,7 @@ class AdminAuthController extends GetxController {
           .doc(uid);
       DocumentSnapshot userDoc = await userRef.get();
 
-      // --- AUTO ROLE & NAME LOGIC ---
+      // --- AUTO ROLE & NAME LOGIC (Sirf Aapke Liye) ---
       if (currentEmail == masterEmail) {
         Map<String, dynamic> updateData = {
           'email': currentEmail,
@@ -533,48 +531,59 @@ class AdminAuthController extends GetxController {
           'uid': uid,
         };
 
-        // Agar Firestore mein pehle se 'name' mojud hai, toh wahi rehne dein
-        // Agar nahi hai, toh Auth wala original name dal dein
         if (!userDoc.exists ||
             (userDoc.data() as Map<String, dynamic>)['name'] == null) {
           updateData['name'] = originalName;
         }
 
         await userRef.set(updateData, SetOptions(merge: true));
-
-        // Refresh document after update
-        userDoc = await userRef.get();
+        userDoc = await userRef.get(); // Refresh data
       }
 
-      // 3. Final Verification
-      if (userDoc.exists && userDoc['role'] == 'super_admin') {
-        isLoading.value = false;
+      // --- 3. FINAL VERIFICATION (Fix Yahan Hai) ---
+      if (userDoc.exists) {
+        String role = userDoc['role'] ?? 'user';
 
-        // Success Snackbar mein Original Name show hoga
-        String finalName = userDoc['name'] ?? originalName;
+        // Ab naya admin bhi login ho sakega kyunki hum dono roles check kar rahe hain
+        if (role == 'super_admin' || role == 'admin') {
+          isLoading.value = false;
 
-        Get.offAll(() => HomeScreenPro()); // Ya jo bhi aapka route hai
-        Get.snackbar(
-          "Success",
-          "Welcome Back, $finalName!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+          String finalName = userDoc['name'] ?? originalName;
+
+          Get.offAll(() => const HomeScreenPro());
+
+          Get.snackbar(
+            "Success",
+            "Welcome Back, $finalName!",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        } else {
+          // Agar role sirf 'user' hai toh nikal do
+          await _auth.signOut();
+          isLoading.value = false;
+          Get.snackbar(
+            "Access Denied",
+            "Aap admin nahi hain.",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
       } else {
+        // Agar record hi nahi mila Firestore mein
         await _auth.signOut();
         isLoading.value = false;
         Get.snackbar(
-          "Access Denied",
-          "Aap admin nahi hain.",
+          "Error",
+          "User record not found in database.",
           backgroundColor: Colors.red,
-          colorText: Colors.white,
         );
       }
     } catch (e) {
       isLoading.value = false;
       Get.snackbar(
         "Login Failed",
-        "Invalid Credentials",
+        "Invalid Credentials ya Network error",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
