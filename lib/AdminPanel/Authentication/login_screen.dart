@@ -245,8 +245,10 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
-// Note: Ensure your controller import is correct
-// import 'package:panda_adminpanel/AdminPanel/Controllers/admin_auth_controller.dart';
+import 'package:panda_adminpanel/admin_panel_pro/HomeScreens/home_screen.dart';
+
+// Note: Ensure your Home Screen and Routes are correctly defined
+// import 'package:panda_adminpanel/AdminPanel/Routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -255,7 +257,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Controller ko initialize kiya
   final authController = Get.put(AdminAuthController());
   bool _isRememberMe = false;
 
@@ -268,7 +269,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // --- LEFT SIDE: FIXED DESIGN WITH IMAGE ---
           if (!isMobile)
             Expanded(
               flex: 1,
@@ -332,8 +332,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
-          // --- RIGHT SIDE: LOGIN FORM ---
           Expanded(
             flex: 1,
             child: Center(
@@ -363,7 +361,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const Gap(30),
-
                     Text(
                       "Login to your account",
                       style: GoogleFonts.poppins(
@@ -377,15 +374,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                     const Gap(35),
-
                     const Text(
                       "Enter your Email",
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const Gap(8),
                     TextField(
-                      controller:
-                          authController.emailController, // Added Controller
+                      controller: authController.emailController,
                       decoration: InputDecoration(
                         hintText: "Enter admin Email",
                         prefixIcon: const Icon(Icons.email_outlined),
@@ -395,7 +390,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const Gap(20),
-
                     const Text(
                       "Enter your Password",
                       style: TextStyle(fontWeight: FontWeight.w600),
@@ -403,11 +397,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Gap(8),
                     Obx(
                       () => TextField(
-                        controller: authController
-                            .passwordController, // Added Controller
-                        obscureText: !authController
-                            .isPasswordVisible
-                            .value, // Observable logic
+                        controller: authController.passwordController,
+                        obscureText: !authController.isPasswordVisible.value,
                         decoration: InputDecoration(
                           hintText: "••••••••",
                           prefixIcon: const Icon(Icons.lock_outline),
@@ -426,7 +417,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const Gap(15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -452,8 +442,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     const Gap(30),
-
-                    // Admin Login Button Integrated with Logic
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -467,7 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           onPressed: authController.isLoading.value
                               ? null
-                              : () => authController.loginAdmin(), // Logic Call
+                              : () => authController.loginAdmin(),
                           child: authController.isLoading.value
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
@@ -496,24 +484,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
 class AdminAuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   var isLoading = false.obs;
   var isPasswordVisible = false.obs;
 
+  // Aapka Master Email
   final String masterEmail = "arshadbaloch0307@gmail.com";
 
-  // --- LOGIN LOGIC ---
   Future<void> loginAdmin() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar(
         "Error",
-        "Please enter credentials",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        "Fields cannot be empty",
+        backgroundColor: Colors.orange,
       );
       return;
     }
@@ -521,75 +506,78 @@ class AdminAuthController extends GetxController {
     try {
       isLoading.value = true;
 
+      // 1. Firebase Auth Login
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
       String uid = userCredential.user!.uid;
+      String currentEmail = emailController.text.trim();
 
-      // 1. Pehle check karo kya ye admin collection mein hai
-      DocumentSnapshot adminDoc = await _db
-          .collection('adminUsers')
-          .doc(uid)
-          .get();
+      // Original Name nikalne ki koshish (Firebase Auth se)
+      String originalName = userCredential.user!.displayName ?? "Admin User";
 
-      // 2. Agar Master Email hai lekin admin collection mein nahi hai (Jo aapka case hai)
-      if (emailController.text.trim().toLowerCase() == masterEmail &&
-          !adminDoc.exists) {
-        // Screenshots ke mutabiq aapka data create kar dete hain admin collection mein
-        await _db.collection('adminUsers').doc(uid).set({
-          "name": "Arshad Lashari", // As per your screenshot
-          "email": masterEmail,
-          "dob": "01-01-2000",
-          "gender": "Male",
-          "userId": uid,
-          "role": "super_admin",
-          "status": "active",
-          "createdAt": FieldValue.serverTimestamp(),
-          "userimage":
-              "https://lh3.googleusercontent.com/...", // image link auto pick ho jayega baad mein
-        });
+      // 2. userProfile collection check karein
+      DocumentReference userRef = FirebaseFirestore.instance
+          .collection('userProfile')
+          .doc(uid);
+      DocumentSnapshot userDoc = await userRef.get();
 
-        // Refresh the doc reference
-        adminDoc = await _db.collection('adminUsers').doc(uid).get();
+      // --- AUTO ROLE & NAME LOGIC ---
+      if (currentEmail == masterEmail) {
+        Map<String, dynamic> updateData = {
+          'email': currentEmail,
+          'role': 'super_admin',
+          'status': 'active',
+          'uid': uid,
+        };
+
+        // Agar Firestore mein pehle se 'name' mojud hai, toh wahi rehne dein
+        // Agar nahi hai, toh Auth wala original name dal dein
+        if (!userDoc.exists ||
+            (userDoc.data() as Map<String, dynamic>)['name'] == null) {
+          updateData['name'] = originalName;
+        }
+
+        await userRef.set(updateData, SetOptions(merge: true));
+
+        // Refresh document after update
+        userDoc = await userRef.get();
       }
 
-      // 3. Final Check for login
-      if (adminDoc.exists) {
-        if (adminDoc['status'] == 'active') {
-          Get.snackbar(
-            "Success",
-            "Welcome Master Admin Arshad!",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
-          Get.offAllNamed(AppRoutes.homepro);
-        } else {
-          await _auth.signOut();
-          Get.snackbar(
-            "Pending",
-            "Your admin status is not active.",
-            backgroundColor: Colors.orange,
-          );
-        }
+      // 3. Final Verification
+      if (userDoc.exists && userDoc['role'] == 'super_admin') {
+        isLoading.value = false;
+
+        // Success Snackbar mein Original Name show hoga
+        String finalName = userDoc['name'] ?? originalName;
+
+        Get.offAll(() => HomeScreenPro()); // Ya jo bhi aapka route hai
+        Get.snackbar(
+          "Success",
+          "Welcome Back, $finalName!",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
       } else {
         await _auth.signOut();
+        isLoading.value = false;
         Get.snackbar(
           "Access Denied",
-          "You are not registered in Admin Panel.",
+          "Aap admin nahi hain.",
           backgroundColor: Colors.red,
+          colorText: Colors.white,
         );
       }
     } catch (e) {
+      isLoading.value = false;
       Get.snackbar(
-        "Login Error",
-        "Invalid Email or Password",
+        "Login Failed",
+        "Invalid Credentials",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    } finally {
-      isLoading.value = false;
     }
   }
 }

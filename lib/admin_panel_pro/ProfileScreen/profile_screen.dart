@@ -305,10 +305,12 @@
 //     );
 //   }
 // }
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
@@ -322,7 +324,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Controllers
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController oldPasswordController = TextEditingController();
@@ -334,7 +335,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   String? profileImageUrl;
-  File? _pickedImage;
   bool isLoading = true;
 
   @override
@@ -343,52 +343,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fetchAdminData();
   }
 
-  // --- 1. Fetch Admin Data ---
+  // --- 1. Fetch from 'userProfile' ---
   Future<void> _fetchAdminData() async {
     try {
-      String uid = _auth.currentUser!.uid;
-      DocumentSnapshot adminDoc = await _db
-          .collection('adminUsers')
+      String? uid = _auth.currentUser?.uid;
+      if (uid == null) return;
+
+      // Ab hum 'userProfile' collection se data le rahe hain
+      DocumentSnapshot userDoc = await _db
+          .collection('userProfile')
           .doc(uid)
           .get();
 
-      if (adminDoc.exists) {
+      if (userDoc.exists) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+
         setState(() {
-          nameController.text = adminDoc['name'] ?? "";
-          emailController.text = adminDoc['email'] ?? "";
-          profileImageUrl = adminDoc['userimage'];
+          nameController.text = data['name'] ?? "No Name";
+          emailController.text =
+              data['email'] ?? _auth.currentUser?.email ?? "";
+          profileImageUrl = data['userimage'];
           isLoading = false;
         });
+
+        // Role check logic
+        if (data['role'] == null) {
+          await _db.collection('userProfile').doc(uid).update({
+            "role": "super_admin",
+            "status": "active",
+          });
+        }
+      } else {
+        setState(() => isLoading = false);
       }
     } catch (e) {
+      print("::: Error syncing data: $e :::");
       setState(() => isLoading = false);
     }
   }
 
-  // --- 2. Change & Upload Image Logic ---
+  // --- 2. Change Image (Updates userProfile) ---
   Future<void> _changeProfileImage() async {
     final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 50,
-    );
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       setState(() => isLoading = true);
       try {
         String uid = _auth.currentUser!.uid;
-        _pickedImage = File(image.path);
+        Uint8List fileBytes = await image.readAsBytes();
 
-        // Firebase Storage Upload
         Reference ref = FirebaseStorage.instance
             .ref()
             .child('adminImages')
             .child('$uid.jpg');
-        await ref.putFile(_pickedImage!);
+
+        await ref.putData(
+          fileBytes,
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+
         String downloadUrl = await ref.getDownloadURL();
 
-        // Update Firestore
-        await _db.collection('adminUsers').doc(uid).update({
+        // Update in 'userProfile'
+        await _db.collection('userProfile').doc(uid).update({
           "userimage": downloadUrl,
         });
 
@@ -396,36 +414,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           profileImageUrl = downloadUrl;
           isLoading = false;
         });
+
         Get.snackbar(
           "Success",
-          "Profile image updated!",
+          "Profile Image Updated",
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
       } catch (e) {
         setState(() => isLoading = false);
-        Get.snackbar("Error", "Upload failed: $e", backgroundColor: Colors.red);
+        Get.snackbar("Error", "Upload failed", backgroundColor: Colors.red);
       }
     }
   }
 
-  // --- 3. Update Password Logic ---
+  // --- 3. Update Password ---
   Future<void> _updatePassword() async {
     if (newPasswordController.text != confirmPasswordController.text) {
       Get.snackbar(
         "Error",
-        "New passwords do not match!",
+        "Passwords do not match!",
         backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-    if (oldPasswordController.text.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "Please enter old password",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
       );
       return;
     }
@@ -442,7 +451,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       Get.snackbar(
         "Success",
-        "Password updated successfully!",
+        "Password Updated",
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
@@ -452,9 +461,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       Get.snackbar(
         "Error",
-        "Failed to update password. Check old password.",
+        "Check your old password",
         backgroundColor: Colors.red,
-        colorText: Colors.white,
       );
     }
   }
@@ -474,7 +482,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           bool isMobile = constraints.maxWidth < 800;
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -482,14 +489,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const Text(
                   "App Setting",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-
                 if (isMobile)
                   Column(
                     children: [
@@ -507,9 +509,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Expanded(child: _buildEditProfileSection()),
                     ],
                   ),
-
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: isMobile
                       ? double.infinity
@@ -532,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             alignment: Alignment.centerLeft,
             child: Text(
               "Profile Avatar",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 40),
@@ -550,14 +550,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: profileImageUrl != null && profileImageUrl!.isNotEmpty
-                      ? Image.network(
-                          profileImageUrl!,
-                          height: 150,
-                          width: 150,
-                          fit: BoxFit.cover,
-                        )
-                      : Image(image: AssetImage(AppImages.user), height: 150),
+                  child: SizedBox(
+                    height: 150,
+                    width: 150,
+                    child: _displayImage(),
+                  ),
                 ),
               ),
               GestureDetector(
@@ -580,10 +577,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             nameController.text,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          const SizedBox(height: 10),
         ],
       ),
     );
+  }
+
+  Widget _displayImage() {
+    if (profileImageUrl != null && profileImageUrl!.startsWith('http')) {
+      return Image.network(
+        profileImageUrl!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            Image.asset(AppImages.user, fit: BoxFit.cover),
+      );
+    } else {
+      return Image.asset(AppImages.user, fit: BoxFit.cover);
+    }
   }
 
   Widget _buildEditProfileSection() {
@@ -593,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           const Text(
             "Edit Profile",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 25),
           _buildLabel("Name"),
@@ -605,14 +614,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: _buildSubmitButton(
-              onPressed: () {
-                // Yahan aap Name update ka logic dal sakte hain agar zarurat ho
+              onPressed: () async {
+                String uid = _auth.currentUser!.uid;
+                await _db.collection('userProfile').doc(uid).update({
+                  "name": nameController.text,
+                });
                 Get.snackbar(
-                  "Notice",
-                  "Name update logic can be added here",
-                  backgroundColor: Colors.blue,
+                  "Success",
+                  "Name Updated",
+                  backgroundColor: Colors.green,
                   colorText: Colors.white,
                 );
+                setState(() {}); // Refresh UI name
               },
             ),
           ),
@@ -628,66 +641,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           const Text(
             "Change Password",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 25),
           _buildLabel("Old Password"),
           _buildTextField(oldPasswordController, isPassword: true),
           const SizedBox(height: 20),
-          LayoutBuilder(
-            builder: (context, subConstraints) {
-              if (subConstraints.maxWidth < 500) {
-                return Column(
-                  children: [
-                    _buildLabel("New Password"),
-                    _buildTextField(
-                      newPasswordController,
-                      isPassword: true,
-                      hint: "Enter New Password",
-                    ),
-                    const SizedBox(height: 20),
-                    _buildLabel("Confirm Password"),
-                    _buildTextField(
-                      confirmPasswordController,
-                      isPassword: true,
-                      hint: "Enter Confirm Password",
-                    ),
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabel("New Password"),
-                        _buildTextField(
-                          newPasswordController,
-                          isPassword: true,
-                          hint: "Enter New Password",
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabel("Confirm Password"),
-                        _buildTextField(
-                          confirmPasswordController,
-                          isPassword: true,
-                          hint: "Enter Confirm Password",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+          _buildLabel("New Password"),
+          _buildTextField(newPasswordController, isPassword: true),
+          const SizedBox(height: 20),
+          _buildLabel("Confirm Password"),
+          _buildTextField(confirmPasswordController, isPassword: true),
           const SizedBox(height: 30),
           Align(
             alignment: Alignment.centerRight,
@@ -698,56 +662,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // --- Helper Widgets (No UI Changes) ---
-
-  Widget _buildSubmitButton({required VoidCallback onPressed}) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF4CAF50),
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      child: const Text("Submit", style: TextStyle(color: Colors.white)),
-    );
-  }
-
-  Widget _buildCard({required Widget child, double? width}) {
+  Widget _buildCard({required Widget child}) {
     return Container(
-      width: width,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
         ],
       ),
       child: child,
     );
   }
 
-  Widget _buildLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontWeight: FontWeight.w500,
-          color: Colors.black54,
-        ),
+  Widget _buildLabel(String label) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Text(
+      label,
+      style: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.black54,
       ),
-    );
-  }
+    ),
+  );
 
   Widget _buildTextField(
     TextEditingController controller, {
     bool isPassword = false,
-    String? hint,
     bool readOnly = false,
   }) {
     return TextField(
@@ -755,25 +697,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       obscureText: isPassword,
       readOnly: readOnly,
       decoration: InputDecoration(
-        hintText: hint,
         filled: true,
         fillColor: const Color(0xFFF8F9FB),
-        suffixIcon: isPassword
-            ? const Icon(Icons.visibility_off_outlined, size: 20)
-            : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+          borderSide: BorderSide.none,
         ),
       ),
+    );
+  }
+
+  Widget _buildSubmitButton({required VoidCallback onPressed}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF4CAF50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      child: const Text("Submit", style: TextStyle(color: Colors.white)),
     );
   }
 }
